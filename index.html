@@ -1,619 +1,607 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spot It! AI Solver</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --red: #ff3b5c;
-            --green: #00d68f;
-            --yellow: #ffcc00;
-            --blue: #4361ee;
-            --purple: #7b2fff;
-            --bg: #0f0e17;
-            --card: #1a1928;
-            --card2: #22213a;
-            --text: #fffffe;
-            --subtext: #a7a9be;
-        }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Spot It! · AI Solver</title>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+:root{
+  --red:#ff4757;
+  --orange:#ff8c00;
+  --yellow:#ffd32a;
+  --green:#2ed573;
+  --teal:#1e90ff;
+  --purple:#a55eea;
+  --pink:#ff6b9d;
+  --bg:#fff9f0;
+  --text:#2d2d44;
+  --muted:#9898b0;
+  --white:#ffffff;
+  --card:#ffffff;
+  --shadow:rgba(45,45,68,0.12);
+}
 
-        body {
-            font-family: 'Nunito', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+html{scroll-behavior:smooth}
 
-        /* Animated background dots */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: radial-gradient(circle at 20% 20%, rgba(123,47,255,0.15) 0%, transparent 50%),
-                              radial-gradient(circle at 80% 80%, rgba(67,97,238,0.15) 0%, transparent 50%),
-                              radial-gradient(circle at 60% 10%, rgba(255,59,92,0.1) 0%, transparent 40%);
-            pointer-events: none;
-            z-index: 0;
-        }
+body{
+  font-family:'Nunito',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  position:relative;
+}
 
-        .page-wrap {
-            position: relative;
-            z-index: 1;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 30px 20px 60px;
-        }
+/* ── CONFETTI DOTS BG ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    radial-gradient(circle,var(--yellow) 2px,transparent 2px),
+    radial-gradient(circle,var(--pink) 2px,transparent 2px),
+    radial-gradient(circle,var(--teal) 2px,transparent 2px),
+    radial-gradient(circle,var(--green) 2px,transparent 2px),
+    radial-gradient(circle,var(--purple) 2px,transparent 2px);
+  background-size:120px 120px,80px 80px,100px 100px,90px 90px,70px 70px;
+  background-position:0 0,40px 40px,20px 70px,60px 10px,10px 50px;
+  opacity:0.18;
+  pointer-events:none;z-index:0;
+}
 
-        /* Header */
-        header {
-            text-align: center;
-            margin-bottom: 36px;
-        }
+/* ── RAINBOW TOP BAR ── */
+.rainbow-bar{
+  height:7px;
+  background:linear-gradient(90deg,var(--red),var(--orange),var(--yellow),var(--green),var(--teal),var(--purple),var(--pink));
+  width:100%;
+}
 
-        .logo {
-            display: inline-flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 8px;
-        }
+/* ── SHELL ── */
+.shell{
+  position:relative;z-index:1;
+  max-width:860px;margin:0 auto;
+  padding:36px 24px 80px;
+}
 
-        .logo-icon {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, var(--red), var(--purple));
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            box-shadow: 0 8px 24px rgba(255,59,92,0.4);
-            animation: float 3s ease-in-out infinite;
-        }
+/* ── HEADER ── */
+.header{text-align:center;margin-bottom:40px}
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-6px); }
-        }
+.header-emojis{
+  font-size:40px;
+  display:flex;justify-content:center;gap:8px;
+  margin-bottom:12px;
+}
+.header-emojis span{
+  display:inline-block;
+  animation:wobble 2.5s ease-in-out infinite;
+}
+.header-emojis span:nth-child(1){animation-delay:0s}
+.header-emojis span:nth-child(2){animation-delay:.2s}
+.header-emojis span:nth-child(3){animation-delay:.4s}
+.header-emojis span:nth-child(4){animation-delay:.6s}
+.header-emojis span:nth-child(5){animation-delay:.8s}
 
-        h1 {
-            font-family: 'Fredoka One', cursive;
-            font-size: clamp(2rem, 6vw, 3rem);
-            background: linear-gradient(135deg, #fff 0%, var(--yellow) 50%, var(--red) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: 1px;
-        }
+@keyframes wobble{
+  0%,100%{transform:translateY(0) rotate(0deg)}
+  25%{transform:translateY(-8px) rotate(-5deg)}
+  75%{transform:translateY(-4px) rotate(4deg)}
+}
 
-        .tagline {
-            color: var(--subtext);
-            font-size: 15px;
-            font-weight: 600;
-            margin-top: 6px;
-            letter-spacing: 0.5px;
-        }
+h1{
+  font-family:'Baloo 2',cursive;
+  font-size:clamp(2.8rem,8vw,4.8rem);
+  font-weight:800;
+  line-height:1;
+  letter-spacing:-1px;
+  color:var(--text);
+  position:relative;
+  display:inline-block;
+  margin-bottom:6px;
+}
 
-        /* Status bar */
-        #status-bar {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            background: var(--card);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 50px;
-            padding: 10px 20px;
-            margin-bottom: 24px;
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--subtext);
-            transition: all 0.3s;
-        }
+/* Colourful underline */
+h1::after{
+  content:'';
+  display:block;
+  height:8px;
+  border-radius:4px;
+  background:linear-gradient(90deg,var(--red),var(--orange),var(--yellow),var(--green),var(--teal),var(--purple));
+  margin-top:4px;
+  animation:shimmer 3s linear infinite;
+  background-size:200% auto;
+}
+@keyframes shimmer{0%{background-position:0% center}100%{background-position:200% center}}
 
-        #status-bar.ready {
-            color: var(--green);
-            border-color: rgba(0,214,143,0.3);
-            background: rgba(0,214,143,0.08);
-        }
+.subtitle{
+  font-size:16px;color:var(--muted);
+  font-weight:600;margin-top:12px;
+}
 
-        #status-bar.error {
-            color: var(--red);
-            border-color: rgba(255,59,92,0.3);
-        }
+/* ── STAR DIVIDER ── */
+.star-row{
+  display:flex;align-items:center;gap:10px;
+  justify-content:center;margin:20px 0;color:var(--yellow);
+  font-size:18px;
+}
+.star-row::before,.star-row::after{
+  content:'';flex:1;max-width:120px;
+  height:2px;border-radius:2px;
+  background:linear-gradient(90deg,transparent,var(--yellow));
+}
+.star-row::after{background:linear-gradient(90deg,var(--yellow),transparent)}
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--subtext);
-            flex-shrink: 0;
-        }
+/* ── STATUS ── */
+.status-wrap{text-align:center;margin-bottom:28px}
 
-        #status-bar.ready .status-dot {
-            background: var(--green);
-            box-shadow: 0 0 8px var(--green);
-            animation: pulse 2s infinite;
-        }
+.status-pill{
+  display:inline-flex;align-items:center;gap:10px;
+  border-radius:50px;
+  padding:11px 24px;
+  font-size:14px;font-weight:800;
+  background:var(--white);
+  border:3px solid #e8e8f0;
+  color:var(--muted);
+  box-shadow:0 4px 16px var(--shadow);
+  transition:all .4s;
+}
+.status-pill.ready{
+  border-color:var(--green);
+  color:var(--green);
+  background:#f0fff8;
+  box-shadow:0 4px 20px rgba(46,213,115,0.25);
+}
+.status-pill.error{
+  border-color:var(--red);
+  color:var(--red);
+  background:#fff5f5;
+}
+.s-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:currentColor;flex-shrink:0;
+}
+.status-pill.ready .s-dot{animation:bouncy 1.2s ease-in-out infinite}
+@keyframes bouncy{0%,100%{transform:scale(1)}50%{transform:scale(1.5)}}
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
+/* ── CONTROLS ── */
+.controls{
+  display:flex;justify-content:center;gap:14px;
+  flex-wrap:wrap;margin-bottom:28px;
+}
 
-        /* Controls */
-        .controls {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
+.btn{
+  font-family:'Baloo 2',cursive;
+  font-weight:700;font-size:17px;
+  border:none;border-radius:18px;
+  padding:13px 28px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:10px;
+  transition:transform .15s,box-shadow .15s;
+  position:relative;overflow:hidden;
+  letter-spacing:0.3px;
+  border-bottom:5px solid rgba(0,0,0,0.15);
+}
+.btn:hover{transform:translateY(-3px)}
+.btn:active{transform:translateY(1px);border-bottom-width:2px}
 
-        .btn {
-            font-family: 'Nunito', sans-serif;
-            font-weight: 800;
-            font-size: 15px;
-            border: none;
-            padding: 13px 26px;
-            border-radius: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            letter-spacing: 0.3px;
-        }
+.btn-cam{
+  background:linear-gradient(135deg,#4f8ef7,#5e6cf5);
+  color:#fff;
+  box-shadow:0 6px 24px rgba(79,142,247,0.4);
+}
+.btn-upload{
+  background:linear-gradient(135deg,#ff6b9d,#ff4757);
+  color:#fff;
+  box-shadow:0 6px 24px rgba(255,71,87,0.4);
+}
+.btn-icon{font-size:20px}
+input[type=file]{display:none}
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--blue), var(--purple));
-            color: white;
-            box-shadow: 0 4px 20px rgba(67,97,238,0.4);
-        }
+/* ── MEDIA CARD ── */
+.media-card{
+  background:var(--white);
+  border-radius:28px;
+  overflow:hidden;
+  position:relative;
+  min-height:260px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 12px 48px var(--shadow),0 0 0 4px rgba(255,211,42,0.3);
+  margin-bottom:24px;
+  border:3px solid #f0e8ff;
+}
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 28px rgba(67,97,238,0.5);
-        }
+/* Sticker dots around the card */
+.media-card::before{
+  content:'⭐ 🎯 ⭐ 🎯 ⭐ 🎯 ⭐ 🎯 ⭐ 🎯 ⭐ 🎯 ⭐ 🎯 ⭐ 🎯';
+  position:absolute;top:-1px;left:0;right:0;
+  font-size:11px;text-align:center;
+  letter-spacing:4px;opacity:0.25;pointer-events:none;z-index:0;
+  white-space:nowrap;overflow:hidden;
+}
 
-        .btn-secondary {
-            background: linear-gradient(135deg, var(--red), #ff6b6b);
-            color: white;
-            box-shadow: 0 4px 20px rgba(255,59,92,0.4);
-        }
+.ph{
+  text-align:center;padding:52px 24px;z-index:1;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+}
+.ph-circle{
+  width:100px;height:100px;border-radius:50%;
+  background:linear-gradient(135deg,#fff0d4,#ffd6e8);
+  border:4px solid #ffe0c8;
+  display:flex;align-items:center;justify-content:center;
+  font-size:44px;
+  animation:spin-float 4s ease-in-out infinite;
+  box-shadow:0 8px 28px rgba(255,140,0,0.2);
+}
+@keyframes spin-float{
+  0%,100%{transform:translateY(0) rotate(-3deg)}
+  50%{transform:translateY(-12px) rotate(3deg)}
+}
+.ph h3{font-family:'Baloo 2',cursive;font-size:18px;color:var(--text)}
+.ph p{font-size:14px;color:var(--muted);max-width:220px;line-height:1.6}
 
-        .btn-secondary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 28px rgba(255,59,92,0.5);
-        }
+#video,#img-el{
+  width:100%;display:none;
+  border-radius:24px;position:relative;z-index:1;
+}
+#det-canvas{
+  position:absolute;inset:0;width:100%;height:100%;
+  pointer-events:none;z-index:2;border-radius:24px;
+}
 
-        .btn:active { transform: scale(0.97); }
+/* ── RESULTS PANEL ── */
+#results{
+  display:none;
+  border-radius:28px;
+  overflow:hidden;
+  box-shadow:0 12px 48px var(--shadow);
+  margin-bottom:28px;
+  border:3px solid transparent;
+  animation:bounceIn .5s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes bounceIn{
+  0%{opacity:0;transform:scale(.85) translateY(20px)}
+  60%{transform:scale(1.03) translateY(-4px)}
+  100%{opacity:1;transform:scale(1) translateY(0)}
+}
 
-        input[type="file"] { display: none; }
+#results.ok-result{border-color:var(--green)}
+#results.fail-result{border-color:#ffb3c1}
 
-        /* Media container */
-        .media-wrap {
-            position: relative;
-            border-radius: 20px;
-            overflow: hidden;
-            background: var(--card);
-            border: 2px solid rgba(255,255,255,0.07);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            margin-bottom: 24px;
-            min-height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+.r-head{
+  padding:20px 28px;
+  display:flex;align-items:center;gap:14px;
+}
+.r-head.ok{
+  background:linear-gradient(135deg,#d4fcea,#a8f5d0);
+}
+.r-head.fail{
+  background:linear-gradient(135deg,#ffe0e8,#ffc8d4);
+}
 
-        .media-placeholder {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--subtext);
-        }
+.r-head-icon{
+  font-size:36px;
+  animation:spin-once .5s ease-out;
+}
+@keyframes spin-once{from{transform:rotate(-20deg) scale(.6)}to{transform:rotate(0) scale(1)}}
 
-        .media-placeholder .ph-icon {
-            font-size: 52px;
-            margin-bottom: 12px;
-            opacity: 0.5;
-        }
+.r-head-text{}
+.r-head-title{
+  font-family:'Baloo 2',cursive;
+  font-size:22px;font-weight:800;
+  color:var(--text);line-height:1.1;
+}
+.r-head-sub{font-size:13px;color:var(--muted);font-weight:600;margin-top:2px}
 
-        .media-placeholder p {
-            font-size: 15px;
-            font-weight: 600;
-        }
+.r-body{
+  background:var(--white);
+  padding:22px 28px;
+}
 
-        #video, #image-el {
-            width: 100%;
-            display: none;
-            border-radius: 18px;
-        }
+.r-meta{
+  display:flex;align-items:center;gap:10px;
+  font-size:14px;color:var(--muted);font-weight:700;
+  margin-bottom:18px;
+}
+.r-chip{
+  background:linear-gradient(135deg,var(--orange),var(--yellow));
+  border-radius:50px;padding:3px 14px;
+  font-size:14px;color:var(--white);font-weight:800;
+  box-shadow:0 3px 10px rgba(255,140,0,0.3);
+}
 
-        #overlay-canvas {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            border-radius: 18px;
-        }
+.dup-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:12px;list-style:none;
+}
 
-        /* Results Panel */
-        #results-panel {
-            display: none;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-            margin-bottom: 24px;
-            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+.dup-item{
+  background:linear-gradient(135deg,#f0fff8,#e0ffee);
+  border:2px solid var(--green);
+  border-radius:18px;
+  padding:12px 16px;
+  display:flex;align-items:center;gap:10px;
+  animation:popBounce .35s cubic-bezier(.16,1,.3,1) both;
+  box-shadow:0 4px 14px rgba(46,213,115,0.2);
+}
+@keyframes popBounce{
+  0%{opacity:0;transform:scale(.7) rotate(-5deg)}
+  70%{transform:scale(1.08) rotate(1deg)}
+  100%{opacity:1;transform:scale(1) rotate(0)}
+}
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+.dup-emoji{font-size:28px;line-height:1;flex-shrink:0}
+.dup-info{flex:1;min-width:0}
+.dup-name{
+  font-size:13px;font-weight:800;color:var(--text);
+  text-transform:capitalize;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.dup-x{
+  background:var(--green);color:#fff;
+  border-radius:50px;padding:2px 10px;
+  font-size:12px;font-weight:900;flex-shrink:0;
+  box-shadow:0 2px 8px rgba(46,213,115,0.4);
+}
 
-        #result-header {
-            padding: 18px 24px;
-            font-family: 'Fredoka One', cursive;
-            font-size: 24px;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+.no-dup{
+  text-align:center;padding:12px;
+  font-size:16px;font-weight:700;color:var(--red);
+}
 
-        #result-header.match {
-            background: linear-gradient(135deg, #00d68f, #00b876);
-            color: white;
-        }
-
-        #result-header.no-match {
-            background: linear-gradient(135deg, var(--red), #c0392b);
-            color: white;
-        }
-
-        #result-body {
-            background: var(--card);
-            padding: 20px 24px;
-            border: 1px solid rgba(255,255,255,0.07);
-            border-top: none;
-            border-radius: 0 0 20px 20px;
-        }
-
-        .symbol-count {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--subtext);
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .count-badge {
-            background: rgba(255,255,255,0.08);
-            border-radius: 50px;
-            padding: 3px 12px;
-            font-size: 15px;
-            color: var(--yellow);
-            font-weight: 800;
-        }
-
-        .duplicate-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .duplicate-list li {
-            background: rgba(0,214,143,0.1);
-            border: 1px solid rgba(0,214,143,0.25);
-            border-radius: 12px;
-            padding: 10px 16px;
-            font-size: 16px;
-            font-weight: 800;
-            color: var(--green);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
-
-        @keyframes popIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .duplicate-list li .dup-count {
-            margin-left: auto;
-            background: var(--green);
-            color: var(--bg);
-            border-radius: 50px;
-            padding: 2px 10px;
-            font-size: 13px;
-        }
-
-        .no-dup-msg {
-            color: var(--subtext);
-            text-align: center;
-            font-size: 15px;
-            font-weight: 700;
-            padding: 8px 0;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            color: rgba(167,169,190,0.4);
-            font-size: 12px;
-            font-weight: 600;
-            margin-top: 20px;
-        }
-    </style>
+/* ── FUN FOOTER ── */
+footer{
+  text-align:center;
+  margin-top:20px;
+  font-size:13px;color:var(--muted);font-weight:700;
+}
+.footer-emojis{font-size:20px;margin-bottom:4px}
+</style>
 </head>
 <body>
-<div class="page-wrap">
 
-    <header>
-        <div class="logo">
-            <div class="logo-icon">🔍</div>
-            <h1>Spot It! Solver</h1>
-        </div>
-        <p class="tagline">AI-powered symbol detection · YOLOv8</p>
-    </header>
+<div class="rainbow-bar"></div>
 
-    <div id="status-bar">
-        <div class="status-dot"></div>
-        <span id="status-text">Loading model, please wait…</span>
+<div class="shell">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-emojis">
+      <span>🔍</span><span>🎯</span><span>🃏</span><span>⭐</span><span>🎉</span>
     </div>
+    <h1>Spot It! AI Solver</h1>
+    <p class="subtitle">✨ Upload a card · Let the AI find your symbols! ✨</p>
+  </header>
 
-    <div class="controls">
-        <button class="btn btn-primary" id="cam-btn">
-            📷 Start Camera
-        </button>
-        <label class="btn btn-secondary">
-            🖼️ Upload Image
-            <input type="file" id="upload-input" accept="image/*">
-        </label>
+  <div class="star-row">⭐ ⭐ ⭐</div>
+
+  <!-- Status -->
+  <div class="status-wrap">
+    <div class="status-pill" id="status-pill">
+      <div class="s-dot"></div>
+      <span id="status-txt">Loading the magic… 🪄</span>
     </div>
+  </div>
 
-    <div class="media-wrap" id="media-wrap">
-        <div class="media-placeholder" id="placeholder">
-            <div class="ph-icon">🃏</div>
-            <p>Upload a Spot It! card or use your camera</p>
-        </div>
-        <video id="video" autoplay playsinline></video>
-        <img id="image-el" alt="Uploaded card" />
-        <canvas id="overlay-canvas"></canvas>
+  <!-- Controls -->
+  <div class="controls">
+    <button class="btn btn-cam" id="cam-btn">
+      <span class="btn-icon">📷</span> Start Camera
+    </button>
+    <label class="btn btn-upload">
+      <span class="btn-icon">🖼️</span> Upload Card
+      <input type="file" id="upload-input" accept="image/*"/>
+    </label>
+  </div>
+
+  <!-- Media -->
+  <div class="media-card" id="media-card">
+    <div class="ph" id="ph">
+      <div class="ph-circle">🃏</div>
+      <h3>No card yet!</h3>
+      <p>Upload a Spot It! card or point your camera at one</p>
     </div>
+    <video id="video" autoplay playsinline></video>
+    <img id="img-el" alt="card"/>
+    <canvas id="det-canvas"></canvas>
+  </div>
 
-    <div id="results-panel">
-        <div id="result-header"></div>
-        <div id="result-body">
-            <div class="symbol-count" id="symbol-count"></div>
-            <ul class="duplicate-list" id="duplicate-list"></ul>
-            <div class="no-dup-msg" id="no-dup-msg"></div>
-        </div>
+  <!-- Results -->
+  <div id="results">
+    <div class="r-head" id="r-head">
+      <div class="r-head-icon" id="r-icon"></div>
+      <div class="r-head-text">
+        <div class="r-head-title" id="r-title"></div>
+        <div class="r-head-sub" id="r-sub"></div>
+      </div>
     </div>
+    <div class="r-body">
+      <div class="r-meta">
+        <span>🎯 Symbols found:</span>
+        <span class="r-chip" id="r-count">0</span>
+      </div>
+      <ul class="dup-grid" id="dup-grid"></ul>
+      <div class="no-dup" id="no-dup"></div>
+    </div>
+  </div>
 
-    <footer>Powered by TensorFlow.js · YOLOv8 · 57 symbol classes</footer>
+  <!-- Footer -->
+  <footer>
+    <div class="footer-emojis">🌟 🎮 🤖 🎮 🌟</div>
+    Powered by TensorFlow.js &amp; YOLOv8 · 57 Spot It! symbols
+  </footer>
+
 </div>
 
 <script>
-    const classNames = [
-        "anchor", "apple", "baby_bottle", "bird", "bomb", "cactus", "candle",
-        "carrot", "cat", "cheese", "clock", "clown", "dinosaur", "dog", "dolphin",
-        "dragon", "exclamation_point", "eye", "fire", "flower", "four_leaf_clover",
-        "ghost", "green_splat", "hammer", "hand", "heart", "ice_cube", "igloo",
-        "key", "knight", "ladybug", "leaf", "light_bulb", "lightning", "lips",
-        "lock", "moon", "orange_man", "pencil", "question_mark", "scissors",
-        "skull", "snowflake", "snowman", "spider", "spider_web", "stop_sign",
-        "sun", "sunglasses", "target", "taxi", "tortoise", "treble_clef", "tree",
-        "water_drop", "yin_yang", "zebra"
-    ];
+const classNames=["anchor","apple","baby_bottle","bird","bomb","cactus","candle","carrot","cat","cheese","clock","clown","dinosaur","dog","dolphin","dragon","exclamation_point","eye","fire","flower","four_leaf_clover","ghost","green_splat","hammer","hand","heart","ice_cube","igloo","key","knight","ladybug","leaf","light_bulb","lightning","lips","lock","moon","orange_man","pencil","question_mark","scissors","skull","snowflake","snowman","spider","spider_web","stop_sign","sun","sunglasses","target","taxi","tortoise","treble_clef","tree","water_drop","yin_yang","zebra"];
 
-    const emojiMap = {
-        anchor:"⚓", apple:"🍎", baby_bottle:"🍼", bird:"🐦", bomb:"💣",
-        cactus:"🌵", candle:"🕯️", carrot:"🥕", cat:"🐱", cheese:"🧀",
-        clock:"🕐", clown:"🤡", dinosaur:"🦕", dog:"🐶", dolphin:"🐬",
-        dragon:"🐉", exclamation_point:"❗", eye:"👁️", fire:"🔥", flower:"🌸",
-        four_leaf_clover:"🍀", ghost:"👻", green_splat:"💚", hammer:"🔨",
-        hand:"✋", heart:"❤️", ice_cube:"🧊", igloo:"🏠", key:"🔑",
-        knight:"♞", ladybug:"🐞", leaf:"🍃", light_bulb:"💡", lightning:"⚡",
-        lips:"👄", lock:"🔒", moon:"🌙", orange_man:"🧡", pencil:"✏️",
-        question_mark:"❓", scissors:"✂️", skull:"💀", snowflake:"❄️",
-        snowman:"⛄", spider:"🕷️", spider_web:"🕸️", stop_sign:"🛑",
-        sun:"☀️", sunglasses:"🕶️", target:"🎯", taxi:"🚕", tortoise:"🐢",
-        treble_clef:"🎵", tree:"🌲", water_drop:"💧", yin_yang:"☯️", zebra:"🦓"
-    };
+const emojiMap={anchor:"⚓",apple:"🍎",baby_bottle:"🍼",bird:"🐦",bomb:"💣",cactus:"🌵",candle:"🕯️",carrot:"🥕",cat:"🐱",cheese:"🧀",clock:"🕐",clown:"🤡",dinosaur:"🦕",dog:"🐶",dolphin:"🐬",dragon:"🐉",exclamation_point:"❗",eye:"👁️",fire:"🔥",flower:"🌸",four_leaf_clover:"🍀",ghost:"👻",green_splat:"💚",hammer:"🔨",hand:"✋",heart:"❤️",ice_cube:"🧊",igloo:"🏠",key:"🔑",knight:"♞",ladybug:"🐞",leaf:"🍃",light_bulb:"💡",lightning:"⚡",lips:"👄",lock:"🔒",moon:"🌙",orange_man:"🧡",pencil:"✏️",question_mark:"❓",scissors:"✂️",skull:"💀",snowflake:"❄️",snowman:"⛄",spider:"🕷️",spider_web:"🕸️",stop_sign:"🛑",sun:"☀️",sunglasses:"🕶️",target:"🎯",taxi:"🚕",tortoise:"🐢",treble_clef:"🎵",tree:"🌲",water_drop:"💧",yin_yang:"☯️",zebra:"🦓"};
 
-    const modelPath = './yolov8_tfjs/model.json';
-    let model;
-    const video = document.getElementById('video');
-    const imageEl = document.getElementById('image-el');
-    const canvas = document.getElementById('overlay-canvas');
-    const ctx = canvas.getContext('2d');
-    const statusBar = document.getElementById('status-bar');
-    const statusText = document.getElementById('status-text');
-    const placeholder = document.getElementById('placeholder');
-    let isVideoRunning = false;
+const MODEL_PATH='./yolov8_tfjs/model.json';
+let model,isRunning=false;
+const video=document.getElementById('video');
+const imgEl=document.getElementById('img-el');
+const canvas=document.getElementById('det-canvas');
+const ctx=canvas.getContext('2d');
 
-    function setStatus(msg, state) {
-        statusText.innerText = msg;
-        statusBar.className = state || '';
-    }
+function setStatus(msg,state){
+  document.getElementById('status-txt').textContent=msg;
+  document.getElementById('status-pill').className='status-pill'+(state?' '+state:'');
+}
 
-    async function loadModel() {
-        try {
-            model = await tf.loadGraphModel(modelPath);
-            setStatus('Model ready — let\'s play!', 'ready');
-        } catch (e) {
-            setStatus('Error loading model. Check console.', 'error');
-            console.error(e);
-        }
-    }
+async function loadModel(){
+  try{
+    model=await tf.loadGraphModel(MODEL_PATH);
+    setStatus('Ready to play! 🎉','ready');
+  }catch(e){
+    setStatus('Oops! Model not found 😢','error');
+    console.error(e);
+  }
+}
 
-    function showResults(detectedClasses) {
-        const counts = {};
-        detectedClasses.forEach(c => { counts[c] = (counts[c] || 0) + 1; });
-        const duplicates = Object.entries(counts).filter(([, n]) => n > 1);
+function showResults(detected){
+  const counts={};
+  detected.forEach(c=>{counts[c]=(counts[c]||0)+1});
+  const dups=Object.entries(counts).filter(([,n])=>n>1);
 
-        const panel = document.getElementById('results-panel');
-        const header = document.getElementById('result-header');
-        const sc = document.getElementById('symbol-count');
-        const dupList = document.getElementById('duplicate-list');
-        const noDup = document.getElementById('no-dup-msg');
+  const panel=document.getElementById('results');
+  const head=document.getElementById('r-head');
+  const icon=document.getElementById('r-icon');
+  const title=document.getElementById('r-title');
+  const sub=document.getElementById('r-sub');
+  const countEl=document.getElementById('r-count');
+  const grid=document.getElementById('dup-grid');
+  const noDup=document.getElementById('no-dup');
 
-        panel.style.display = 'block';
-        sc.innerHTML = `🎯 Symbols detected: <span class="count-badge">${detectedClasses.length}</span>`;
-        dupList.innerHTML = '';
-        noDup.innerText = '';
+  panel.style.display='block';
+  countEl.textContent=detected.length;
+  grid.innerHTML='';noDup.textContent='';
 
-        if (duplicates.length > 0) {
-            header.innerHTML = '🟢 Match Found!';
-            header.className = 'match';
-            duplicates.forEach(([name, count], i) => {
-                const emoji = emojiMap[name] || '🔹';
-                const li = document.createElement('li');
-                li.style.animationDelay = `${i * 0.08}s`;
-                li.innerHTML = `<span>${emoji}</span> <span>${name.replace(/_/g, ' ')}</span><span class="dup-count">×${count}</span>`;
-                dupList.appendChild(li);
-            });
-        } else {
-            header.innerHTML = '🔴 No Duplicates';
-            header.className = 'no-match';
-            noDup.innerText = '❌ No duplicate symbols found on this card.';
-        }
-    }
-
-    async function detectFrame(sourceElement) {
-        if (!model) return;
-
-        canvas.width = sourceElement.clientWidth || sourceElement.width;
-        canvas.height = sourceElement.clientHeight || sourceElement.height;
-        const [mW, mH] = [640, 640];
-
-        tf.engine().startScope();
-        const tfImg = tf.browser.fromPixels(sourceElement);
-        const resized = tf.image.resizeBilinear(tfImg, [mW, mH]);
-        const input = resized.div(255.0).expandDims(0);
-        const predictions = await model.executeAsync(input);
-        const transRes = predictions.transpose([0, 2, 1]).squeeze();
-
-        const boxes = [], scores = [], classes = [];
-        const rawData = transRes.arraySync();
-
-        for (let i = 0; i < rawData.length; i++) {
-            const row = rawData[i];
-            const classScores = row.slice(4);
-            const maxScore = Math.max(...classScores);
-            const classId = classScores.indexOf(maxScore);
-            if (maxScore > 0.3) {
-                const [cx, cy, w, h] = row;
-                boxes.push([cy-h/2, cx-w/2, cy+h/2, cx+w/2]);
-                scores.push(maxScore);
-                classes.push(classId);
-            }
-        }
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        if (boxes.length > 0) {
-            const nmsIdx = await tf.image.nonMaxSuppressionAsync(boxes, scores, 20, 0.45, 0.3);
-            const selected = nmsIdx.dataSync();
-
-            const finalClasses = Array.from(selected).map(idx => classNames[classes[idx]] || "Unknown");
-            const counts = {};
-            finalClasses.forEach(c => { counts[c] = (counts[c] || 0) + 1; });
-
-            for (let i = 0; i < selected.length; i++) {
-                const idx = selected[i];
-                const box = boxes[idx];
-                const score = (scores[idx] * 100).toFixed(0);
-                const className = classNames[classes[idx]] || "Unknown";
-                const isDup = counts[className] > 1;
-
-                const ymin = (box[0] / mH) * canvas.height;
-                const xmin = (box[1] / mW) * canvas.width;
-                const ymax = (box[2] / mH) * canvas.height;
-                const xmax = (box[3] / mW) * canvas.width;
-                const rW = xmax - xmin, rH = ymax - ymin;
-
-                const color = isDup ? '#00d68f' : '#ff3b5c';
-                const label = `${emojiMap[className] || ''} ${className.replace(/_/g,' ')} ${score}%`;
-
-                // Glow effect for duplicates
-                if (isDup) {
-                    ctx.shadowColor = '#00d68f';
-                    ctx.shadowBlur = 12;
-                }
-
-                ctx.strokeStyle = color;
-                ctx.lineWidth = isDup ? 3 : 2;
-                ctx.strokeRect(xmin, ymin, rW, rH);
-                ctx.shadowBlur = 0;
-
-                // Label background
-                const textW = ctx.measureText(label).width + 16;
-                ctx.fillStyle = color;
-                ctx.beginPath();
-                ctx.roundRect(xmin, ymin - 24, textW, 22, 6);
-                ctx.fill();
-
-                ctx.fillStyle = isDup ? '#0f0e17' : 'white';
-                ctx.font = 'bold 12px Nunito, sans-serif';
-                ctx.fillText(label, xmin + 8, ymin - 7);
-            }
-
-            if (!isVideoRunning) showResults(finalClasses);
-        }
-
-        tf.engine().endScope();
-        if (isVideoRunning) requestAnimationFrame(() => detectFrame(video));
-    }
-
-    document.getElementById('cam-btn').addEventListener('click', async () => {
-        if (isVideoRunning) {
-            video.srcObject.getTracks().forEach(t => t.stop());
-            video.style.display = 'none';
-            document.getElementById('cam-btn').innerHTML = '📷 Start Camera';
-            isVideoRunning = false;
-        } else {
-            imageEl.style.display = 'none';
-            placeholder.style.display = 'none';
-            document.getElementById('results-panel').style.display = 'none';
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-            video.srcObject = stream;
-            video.style.display = 'block';
-            document.getElementById('cam-btn').innerHTML = '⏹ Stop Camera';
-            video.onloadeddata = () => { isVideoRunning = true; detectFrame(video); };
-        }
+  if(dups.length){
+    panel.className='';panel.id='results';panel.classList.add('ok-result');
+    head.className='r-head ok';
+    icon.textContent='🎉';
+    title.textContent='Match Found!';
+    sub.textContent=`${dups.length} duplicate symbol${dups.length>1?'s':''} spotted!`;
+    dups.forEach(([name,n],i)=>{
+      const li=document.createElement('li');
+      li.className='dup-item';
+      li.style.animationDelay=`${i*0.08}s`;
+      li.innerHTML=`<span class="dup-emoji">${emojiMap[name]||'🔹'}</span><div class="dup-info"><div class="dup-name">${name.replace(/_/g,' ')}</div></div><span class="dup-x">×${n}</span>`;
+      grid.appendChild(li);
     });
+  }else{
+    panel.classList.add('fail-result');
+    head.className='r-head fail';
+    icon.textContent='🤔';
+    title.textContent='No Duplicates!';
+    sub.textContent='Every symbol appears just once.';
+    noDup.textContent='❌ No duplicate symbols found on this card.';
+  }
+}
 
-    document.getElementById('upload-input').addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        if (isVideoRunning) document.getElementById('cam-btn').click();
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            imageEl.src = ev.target.result;
-            imageEl.style.display = 'block';
-            placeholder.style.display = 'none';
-            imageEl.onload = () => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                detectFrame(imageEl);
-            };
-        };
-        reader.readAsDataURL(file);
-    });
+async function detect(src){
+  if(!model)return;
+  canvas.width=src.clientWidth||src.width;
+  canvas.height=src.clientHeight||src.height;
+  const[mW,mH]=[640,640];
+  tf.engine().startScope();
+  const inp=tf.browser.fromPixels(src);
+  const resized=tf.image.resizeBilinear(inp,[mW,mH]).div(255).expandDims(0);
+  const pred=await model.executeAsync(resized);
+  const trans=pred.transpose([0,2,1]).squeeze();
+  const raw=trans.arraySync();
+  const boxes=[],scores=[],cls=[];
+  for(const row of raw){
+    const cs=row.slice(4);
+    const ms=Math.max(...cs);
+    const ci=cs.indexOf(ms);
+    if(ms>0.3){
+      const[cx,cy,w,h]=row;
+      boxes.push([cy-h/2,cx-w/2,cy+h/2,cx+w/2]);
+      scores.push(ms);cls.push(ci);
+    }
+  }
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(boxes.length){
+    const nms=await tf.image.nonMaxSuppressionAsync(boxes,scores,20,.45,.3);
+    const sel=nms.dataSync();
+    const finalCls=Array.from(sel).map(i=>classNames[cls[i]]||'Unknown');
+    const counts={};finalCls.forEach(c=>{counts[c]=(counts[c]||0)+1});
 
-    loadModel();
+    for(let i=0;i<sel.length;i++){
+      const idx=sel[i];
+      const b=boxes[idx];
+      const sc=(scores[idx]*100).toFixed(0);
+      const name=classNames[cls[idx]]||'Unknown';
+      const isDup=counts[name]>1;
+      const ymin=(b[0]/mH)*canvas.height;
+      const xmin=(b[1]/mW)*canvas.width;
+      const ymax=(b[2]/mH)*canvas.height;
+      const xmax=(b[3]/mW)*canvas.width;
+      const rW=xmax-xmin,rH=ymax-ymin;
+
+      const col=isDup?'#2ed573':'#ff4757';
+      const label=`${emojiMap[name]||''} ${name.replace(/_/g,' ')} ${sc}%`;
+      const tw=ctx.measureText(label).width+18;
+
+      // Glow for dups
+      if(isDup){ctx.shadowColor='#2ed573';ctx.shadowBlur=14}
+
+      // Box
+      ctx.strokeStyle=col;
+      ctx.lineWidth=isDup?4:2;
+      ctx.strokeRect(xmin,ymin,rW,rH);
+      ctx.shadowBlur=0;
+
+      // Label pill
+      ctx.fillStyle=col;
+      if(ctx.roundRect)ctx.roundRect(xmin,ymin-26,tw,22,7);
+      else ctx.rect(xmin,ymin-26,tw,22);
+      ctx.fill();
+      ctx.fillStyle=isDup?'#06060f':'#fff';
+      ctx.font='700 12px Nunito,sans-serif';
+      ctx.fillText(label,xmin+9,ymin-9);
+    }
+    if(!isRunning)showResults(finalCls);
+  }
+  tf.engine().endScope();
+  if(isRunning)requestAnimationFrame(()=>detect(video));
+}
+
+document.getElementById('cam-btn').addEventListener('click',async()=>{
+  if(isRunning){
+    video.srcObject.getTracks().forEach(t=>t.stop());
+    video.style.display='none';
+    document.getElementById('cam-btn').innerHTML='<span class="btn-icon">📷</span> Start Camera';
+    isRunning=false;
+  }else{
+    imgEl.style.display='none';
+    document.getElementById('results').style.display='none';
+    document.getElementById('ph').style.display='none';
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    video.srcObject=stream;video.style.display='block';
+    document.getElementById('cam-btn').innerHTML='<span class="btn-icon">⏹️</span> Stop Camera';
+    video.onloadeddata=()=>{isRunning=true;detect(video)};
+  }
+});
+
+document.getElementById('upload-input').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  if(isRunning)document.getElementById('cam-btn').click();
+  const r=new FileReader();
+  r.onload=ev=>{
+    imgEl.src=ev.target.result;
+    imgEl.style.display='block';
+    document.getElementById('ph').style.display='none';
+    imgEl.onload=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);detect(imgEl)};
+  };
+  r.readAsDataURL(f);
+});
+
+loadModel();
 </script>
 </body>
 </html>
