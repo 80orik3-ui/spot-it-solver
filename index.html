@@ -559,22 +559,22 @@ async function detect(src){
       ctx.strokeRect(xmin,ymin,rW,rH);
       ctx.shadowBlur=0;
 
-      // Label background — solid dark for max readability
-      const lx=xmin;
-      const ly=ymin-th-2;
-      ctx.fillStyle='rgba(0,0,0,0.82)';
-      if(ctx.roundRect)ctx.roundRect(lx,ly,tw,th,6);
-      else ctx.rect(lx,ly,tw,th);
-      ctx.fill();
+      // Place label below top edge if too close
+      const lx = xmin;
+      const ly = ymin > th + 4 ? ymin - th - 2 : ymin + 2;
 
-      // Colored left accent strip
-      ctx.fillStyle=col;
-      ctx.fillRect(lx,ly,5,th);
+      // Background
+      ctx.fillStyle = 'rgba(0,0,0,0.88)';
+      ctx.fillRect(lx, ly, tw, th);
 
-      // Label text — white, bold, large
-      ctx.fillStyle='#ffffff';
-      ctx.font='bold 14px Arial,sans-serif';
-      ctx.fillText(label,lx+12,ly+17);
+      // Colored accent strip
+      ctx.fillStyle = col;
+      ctx.fillRect(lx, ly, 5, th);
+
+      // White bold text — drawn last so nothing covers it
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 14px Arial';
+      ctx.fillText(label, lx + 10, ly + 18);
     }
     if(!isRunning)showResults(finalCls);
   }
