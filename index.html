@@ -544,26 +544,37 @@ async function detect(src){
       const rW=xmax-xmin,rH=ymax-ymin;
 
       const col=isDup?'#2ed573':'#ff4757';
-      const label=`${emojiMap[name]||''} ${name.replace(/_/g,' ')} ${sc}%`;
-      const tw=ctx.measureText(label).width+18;
+      const label=`${name.replace(/_/g,' ')} ${sc}%`;
+
+      ctx.font='bold 15px Arial,sans-serif';
+      const tw=ctx.measureText(label).width+20;
+      const th=26;
 
       // Glow for dups
       if(isDup){ctx.shadowColor='#2ed573';ctx.shadowBlur=14}
 
       // Box
       ctx.strokeStyle=col;
-      ctx.lineWidth=isDup?4:2;
+      ctx.lineWidth=isDup?4:2.5;
       ctx.strokeRect(xmin,ymin,rW,rH);
       ctx.shadowBlur=0;
 
-      // Label pill
-      ctx.fillStyle=col;
-      if(ctx.roundRect)ctx.roundRect(xmin,ymin-26,tw,22,7);
-      else ctx.rect(xmin,ymin-26,tw,22);
+      // Label background — solid dark for max readability
+      const lx=xmin;
+      const ly=ymin-th-2;
+      ctx.fillStyle='rgba(0,0,0,0.82)';
+      if(ctx.roundRect)ctx.roundRect(lx,ly,tw,th,6);
+      else ctx.rect(lx,ly,tw,th);
       ctx.fill();
-      ctx.fillStyle=isDup?'#06060f':'#fff';
-      ctx.font='700 12px Nunito,sans-serif';
-      ctx.fillText(label,xmin+9,ymin-9);
+
+      // Colored left accent strip
+      ctx.fillStyle=col;
+      ctx.fillRect(lx,ly,5,th);
+
+      // Label text — white, bold, large
+      ctx.fillStyle='#ffffff';
+      ctx.font='bold 14px Arial,sans-serif';
+      ctx.fillText(label,lx+12,ly+17);
     }
     if(!isRunning)showResults(finalCls);
   }
