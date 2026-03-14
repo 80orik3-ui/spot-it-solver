@@ -5,117 +5,394 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spot It! AI Solver</title>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --red: #ff3b5c;
+            --green: #00d68f;
+            --yellow: #ffcc00;
+            --blue: #4361ee;
+            --purple: #7b2fff;
+            --bg: #0f0e17;
+            --card: #1a1928;
+            --card2: #22213a;
+            --text: #fffffe;
+            --subtext: #a7a9be;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            text-align: center;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 20px;
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
         }
-        h1 { color: #ff4757; }
-        .container {
-            position: relative;
-            display: inline-block;
-            margin-top: 20px;
-            max-width: 100%;
-        }
-        video, img {
-            max-width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            display: none;
-        }
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+
+        /* Animated background dots */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle at 20% 20%, rgba(123,47,255,0.15) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 80%, rgba(67,97,238,0.15) 0%, transparent 50%),
+                              radial-gradient(circle at 60% 10%, rgba(255,59,92,0.1) 0%, transparent 40%);
             pointer-events: none;
+            z-index: 0;
         }
-        .controls { margin-top: 20px; }
-        button, label.upload-btn {
-            background-color: #2ed573;
-            color: white;
-            border: none;
+
+        .page-wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px 20px 60px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 8px;
+        }
+
+        .logo-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 8px 24px rgba(255,59,92,0.4);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        h1 {
+            font-family: 'Fredoka One', cursive;
+            font-size: clamp(2rem, 6vw, 3rem);
+            background: linear-gradient(135deg, #fff 0%, var(--yellow) 50%, var(--red) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
+        }
+
+        .tagline {
+            color: var(--subtext);
+            font-size: 15px;
+            font-weight: 600;
+            margin-top: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Status bar */
+        #status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: var(--card);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 50px;
             padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 5px;
-            display: inline-block;
-            transition: 0.3s;
+            margin-bottom: 24px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--subtext);
+            transition: all 0.3s;
         }
-        button:hover, label.upload-btn:hover { background-color: #27ae60; }
+
+        #status-bar.ready {
+            color: var(--green);
+            border-color: rgba(0,214,143,0.3);
+            background: rgba(0,214,143,0.08);
+        }
+
+        #status-bar.error {
+            color: var(--red);
+            border-color: rgba(255,59,92,0.3);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--subtext);
+            flex-shrink: 0;
+        }
+
+        #status-bar.ready .status-dot {
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: 15px;
+            border: none;
+            padding: 13px 26px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            color: white;
+            box-shadow: 0 4px 20px rgba(67,97,238,0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(67,97,238,0.5);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--red), #ff6b6b);
+            color: white;
+            box-shadow: 0 4px 20px rgba(255,59,92,0.4);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(255,59,92,0.5);
+        }
+
+        .btn:active { transform: scale(0.97); }
+
         input[type="file"] { display: none; }
-        #status { margin-top: 15px; font-weight: bold; color: #57606f; }
+
+        /* Media container */
+        .media-wrap {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: var(--card);
+            border: 2px solid rgba(255,255,255,0.07);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            margin-bottom: 24px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .media-placeholder {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--subtext);
+        }
+
+        .media-placeholder .ph-icon {
+            font-size: 52px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .media-placeholder p {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        #video, #image-el {
+            width: 100%;
+            display: none;
+            border-radius: 18px;
+        }
+
+        #overlay-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            border-radius: 18px;
+        }
 
         /* Results Panel */
         #results-panel {
             display: none;
-            margin: 20px auto;
-            max-width: 500px;
-            border-radius: 12px;
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+            margin-bottom: 24px;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         #result-header {
-            padding: 16px;
-            font-size: 22px;
-            font-weight: bold;
+            padding: 18px 24px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 24px;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #result-header.match {
+            background: linear-gradient(135deg, #00d68f, #00b876);
             color: white;
         }
-        #result-header.match { background-color: #2ed573; }
-        #result-header.no-match { background-color: #ff4757; }
+
+        #result-header.no-match {
+            background: linear-gradient(135deg, var(--red), #c0392b);
+            color: white;
+        }
+
         #result-body {
-            background: white;
-            padding: 16px;
-            text-align: left;
+            background: var(--card);
+            padding: 20px 24px;
+            border: 1px solid rgba(255,255,255,0.07);
+            border-top: none;
+            border-radius: 0 0 20px 20px;
         }
-        #result-body .symbol-count {
+
+        .symbol-count {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--subtext);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .count-badge {
+            background: rgba(255,255,255,0.08);
+            border-radius: 50px;
+            padding: 3px 12px;
             font-size: 15px;
-            color: #57606f;
-            margin-bottom: 12px;
-            text-align: center;
+            color: var(--yellow);
+            font-weight: 800;
         }
-        #result-body .duplicate-list {
+
+        .duplicate-list {
             list-style: none;
-            padding: 0;
-            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
-        #result-body .duplicate-list li {
-            background: #f1f2f6;
-            border-left: 5px solid #2ed573;
-            margin: 6px 0;
-            padding: 8px 12px;
-            border-radius: 6px;
+
+        .duplicate-list li {
+            background: rgba(0,214,143,0.1);
+            border: 1px solid rgba(0,214,143,0.25);
+            border-radius: 12px;
+            padding: 10px 16px;
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 800;
+            color: var(--green);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
-        #result-body .no-dup-msg {
-            color: #ff4757;
-            font-weight: bold;
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .duplicate-list li .dup-count {
+            margin-left: auto;
+            background: var(--green);
+            color: var(--bg);
+            border-radius: 50px;
+            padding: 2px 10px;
+            font-size: 13px;
+        }
+
+        .no-dup-msg {
+            color: var(--subtext);
             text-align: center;
-            font-size: 16px;
+            font-size: 15px;
+            font-weight: 700;
+            padding: 8px 0;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            color: rgba(167,169,190,0.4);
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
+<div class="page-wrap">
 
-    <h1>🔍 Spot It! AI Solver</h1>
-    <p>Upload a card photo to detect symbols and find duplicates!</p>
+    <header>
+        <div class="logo">
+            <div class="logo-icon">🔍</div>
+            <h1>Spot It! Solver</h1>
+        </div>
+        <p class="tagline">AI-powered symbol detection · YOLOv8</p>
+    </header>
+
+    <div id="status-bar">
+        <div class="status-dot"></div>
+        <span id="status-text">Loading model, please wait…</span>
+    </div>
 
     <div class="controls">
-        <button id="cam-btn">Start Camera</button>
-        <label class="upload-btn">
-            Upload Image <input type="file" id="upload-input" accept="image/*">
+        <button class="btn btn-primary" id="cam-btn">
+            📷 Start Camera
+        </button>
+        <label class="btn btn-secondary">
+            🖼️ Upload Image
+            <input type="file" id="upload-input" accept="image/*">
         </label>
     </div>
 
-    <div id="status">Loading model, please wait...</div>
+    <div class="media-wrap" id="media-wrap">
+        <div class="media-placeholder" id="placeholder">
+            <div class="ph-icon">🃏</div>
+            <p>Upload a Spot It! card or use your camera</p>
+        </div>
+        <video id="video" autoplay playsinline></video>
+        <img id="image-el" alt="Uploaded card" />
+        <canvas id="overlay-canvas"></canvas>
+    </div>
 
-    <!-- Results Panel -->
     <div id="results-panel">
         <div id="result-header"></div>
         <div id="result-body">
@@ -125,11 +402,8 @@
         </div>
     </div>
 
-    <div class="container" id="media-container">
-        <video id="video" autoplay playsinline></video>
-        <img id="image" />
-        <canvas id="canvas"></canvas>
-    </div>
+    <footer>Powered by TensorFlow.js · YOLOv8 · 57 symbol classes</footer>
+</div>
 
 <script>
     const classNames = [
@@ -145,68 +419,76 @@
     ];
 
     const emojiMap = {
-        anchor: "⚓", apple: "🍎", baby_bottle: "🍼", bird: "🐦", bomb: "💣",
-        cactus: "🌵", candle: "🕯️", carrot: "🥕", cat: "🐱", cheese: "🧀",
-        clock: "🕐", clown: "🤡", dinosaur: "🦕", dog: "🐶", dolphin: "🐬",
-        dragon: "🐉", exclamation_point: "❗", eye: "👁️", fire: "🔥", flower: "🌸",
-        four_leaf_clover: "🍀", ghost: "👻", green_splat: "💚", hammer: "🔨",
-        hand: "✋", heart: "❤️", ice_cube: "🧊", igloo: "🏠", key: "🔑",
-        knight: "♞", ladybug: "🐞", leaf: "🍃", light_bulb: "💡", lightning: "⚡",
-        lips: "👄", lock: "🔒", moon: "🌙", orange_man: "🧡", pencil: "✏️",
-        question_mark: "❓", scissors: "✂️", skull: "💀", snowflake: "❄️",
-        snowman: "⛄", spider: "🕷️", spider_web: "🕸️", stop_sign: "🛑",
-        sun: "☀️", sunglasses: "🕶️", target: "🎯", taxi: "🚕", tortoise: "🐢",
-        treble_clef: "🎵", tree: "🌲", water_drop: "💧", yin_yang: "☯️", zebra: "🦓"
+        anchor:"⚓", apple:"🍎", baby_bottle:"🍼", bird:"🐦", bomb:"💣",
+        cactus:"🌵", candle:"🕯️", carrot:"🥕", cat:"🐱", cheese:"🧀",
+        clock:"🕐", clown:"🤡", dinosaur:"🦕", dog:"🐶", dolphin:"🐬",
+        dragon:"🐉", exclamation_point:"❗", eye:"👁️", fire:"🔥", flower:"🌸",
+        four_leaf_clover:"🍀", ghost:"👻", green_splat:"💚", hammer:"🔨",
+        hand:"✋", heart:"❤️", ice_cube:"🧊", igloo:"🏠", key:"🔑",
+        knight:"♞", ladybug:"🐞", leaf:"🍃", light_bulb:"💡", lightning:"⚡",
+        lips:"👄", lock:"🔒", moon:"🌙", orange_man:"🧡", pencil:"✏️",
+        question_mark:"❓", scissors:"✂️", skull:"💀", snowflake:"❄️",
+        snowman:"⛄", spider:"🕷️", spider_web:"🕸️", stop_sign:"🛑",
+        sun:"☀️", sunglasses:"🕶️", target:"🎯", taxi:"🚕", tortoise:"🐢",
+        treble_clef:"🎵", tree:"🌲", water_drop:"💧", yin_yang:"☯️", zebra:"🦓"
     };
 
     const modelPath = './yolov8_tfjs/model.json';
     let model;
     const video = document.getElementById('video');
-    const image = document.getElementById('image');
-    const canvas = document.getElementById('canvas');
+    const imageEl = document.getElementById('image-el');
+    const canvas = document.getElementById('overlay-canvas');
     const ctx = canvas.getContext('2d');
-    const statusText = document.getElementById('status');
+    const statusBar = document.getElementById('status-bar');
+    const statusText = document.getElementById('status-text');
+    const placeholder = document.getElementById('placeholder');
     let isVideoRunning = false;
+
+    function setStatus(msg, state) {
+        statusText.innerText = msg;
+        statusBar.className = state || '';
+    }
 
     async function loadModel() {
         try {
             model = await tf.loadGraphModel(modelPath);
-            statusText.innerText = "Model Loaded Successfully! Ready to play.";
-        } catch (error) {
-            statusText.innerText = "Error loading model. Check the console.";
-            console.error("Model load error:", error);
+            setStatus('Model ready — let\'s play!', 'ready');
+        } catch (e) {
+            setStatus('Error loading model. Check console.', 'error');
+            console.error(e);
         }
     }
 
     function showResults(detectedClasses) {
         const counts = {};
         detectedClasses.forEach(c => { counts[c] = (counts[c] || 0) + 1; });
-        const duplicates = Object.entries(counts).filter(([, count]) => count > 1);
+        const duplicates = Object.entries(counts).filter(([, n]) => n > 1);
 
         const panel = document.getElementById('results-panel');
         const header = document.getElementById('result-header');
-        const symbolCount = document.getElementById('symbol-count');
+        const sc = document.getElementById('symbol-count');
         const dupList = document.getElementById('duplicate-list');
-        const noDupMsg = document.getElementById('no-dup-msg');
+        const noDup = document.getElementById('no-dup-msg');
 
         panel.style.display = 'block';
-        symbolCount.innerText = `🎯 Symbols detected: ${detectedClasses.length}`;
+        sc.innerHTML = `🎯 Symbols detected: <span class="count-badge">${detectedClasses.length}</span>`;
         dupList.innerHTML = '';
-        noDupMsg.innerText = '';
+        noDup.innerText = '';
 
         if (duplicates.length > 0) {
-            header.innerText = '🟢 MATCH FOUND!';
+            header.innerHTML = '🟢 Match Found!';
             header.className = 'match';
-            duplicates.forEach(([name, count]) => {
+            duplicates.forEach(([name, count], i) => {
                 const emoji = emojiMap[name] || '🔹';
                 const li = document.createElement('li');
-                li.innerText = `${emoji} ${name} × ${count}`;
+                li.style.animationDelay = `${i * 0.08}s`;
+                li.innerHTML = `<span>${emoji}</span> <span>${name.replace(/_/g, ' ')}</span><span class="dup-count">×${count}</span>`;
                 dupList.appendChild(li);
             });
         } else {
-            header.innerText = '🔴 NO DUPLICATES';
+            header.innerHTML = '🔴 No Duplicates';
             header.className = 'no-match';
-            noDupMsg.innerText = '❌ No duplicate symbols found on this card.';
+            noDup.innerText = '❌ No duplicate symbols found on this card.';
         }
     }
 
@@ -215,15 +497,12 @@
 
         canvas.width = sourceElement.clientWidth || sourceElement.width;
         canvas.height = sourceElement.clientHeight || sourceElement.height;
-        const [modelWidth, modelHeight] = [640, 640];
+        const [mW, mH] = [640, 640];
 
         tf.engine().startScope();
-
         const tfImg = tf.browser.fromPixels(sourceElement);
-        const resized = tf.image.resizeBilinear(tfImg, [modelWidth, modelHeight]);
-        const normalized = resized.div(255.0);
-        const input = normalized.expandDims(0);
-
+        const resized = tf.image.resizeBilinear(tfImg, [mW, mH]);
+        const input = resized.div(255.0).expandDims(0);
         const predictions = await model.executeAsync(input);
         const transRes = predictions.transpose([0, 2, 1]).squeeze();
 
@@ -236,8 +515,8 @@
             const maxScore = Math.max(...classScores);
             const classId = classScores.indexOf(maxScore);
             if (maxScore > 0.3) {
-                const cx = row[0], cy = row[1], w = row[2], h = row[3];
-                boxes.push([cy - h/2, cx - w/2, cy + h/2, cx + w/2]);
+                const [cx, cy, w, h] = row;
+                boxes.push([cy-h/2, cx-w/2, cy+h/2, cx+w/2]);
                 scores.push(maxScore);
                 classes.push(classId);
             }
@@ -246,37 +525,50 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         if (boxes.length > 0) {
-            const nmsIndices = await tf.image.nonMaxSuppressionAsync(boxes, scores, 20, 0.45, 0.3);
-            const selectedIndices = nmsIndices.dataSync();
+            const nmsIdx = await tf.image.nonMaxSuppressionAsync(boxes, scores, 20, 0.45, 0.3);
+            const selected = nmsIdx.dataSync();
 
-            const finalClasses = Array.from(selectedIndices).map(idx => classNames[classes[idx]] || "Unknown");
+            const finalClasses = Array.from(selected).map(idx => classNames[classes[idx]] || "Unknown");
             const counts = {};
             finalClasses.forEach(c => { counts[c] = (counts[c] || 0) + 1; });
 
-            for (let i = 0; i < selectedIndices.length; i++) {
-                const idx = selectedIndices[i];
+            for (let i = 0; i < selected.length; i++) {
+                const idx = selected[i];
                 const box = boxes[idx];
-                const score = (scores[idx] * 100).toFixed(1);
+                const score = (scores[idx] * 100).toFixed(0);
                 const className = classNames[classes[idx]] || "Unknown";
-                const isDuplicate = counts[className] > 1;
+                const isDup = counts[className] > 1;
 
-                const ymin = (box[0] / modelHeight) * canvas.height;
-                const xmin = (box[1] / modelWidth) * canvas.width;
-                const ymax = (box[2] / modelHeight) * canvas.height;
-                const xmax = (box[3] / modelWidth) * canvas.width;
-                const rectW = xmax - xmin;
-                const rectH = ymax - ymin;
+                const ymin = (box[0] / mH) * canvas.height;
+                const xmin = (box[1] / mW) * canvas.width;
+                const ymax = (box[2] / mH) * canvas.height;
+                const xmax = (box[3] / mW) * canvas.width;
+                const rW = xmax - xmin, rH = ymax - ymin;
 
-                const color = isDuplicate ? "#2ed573" : "#ff4757";
+                const color = isDup ? '#00d68f' : '#ff3b5c';
+                const label = `${emojiMap[className] || ''} ${className.replace(/_/g,' ')} ${score}%`;
+
+                // Glow effect for duplicates
+                if (isDup) {
+                    ctx.shadowColor = '#00d68f';
+                    ctx.shadowBlur = 12;
+                }
+
                 ctx.strokeStyle = color;
-                ctx.lineWidth = isDuplicate ? 4 : 2;
-                ctx.strokeRect(xmin, ymin, rectW, rectH);
+                ctx.lineWidth = isDup ? 3 : 2;
+                ctx.strokeRect(xmin, ymin, rW, rH);
+                ctx.shadowBlur = 0;
 
+                // Label background
+                const textW = ctx.measureText(label).width + 16;
                 ctx.fillStyle = color;
-                ctx.fillRect(xmin, ymin - 20, ctx.measureText(className).width + 45, 20);
-                ctx.fillStyle = "white";
-                ctx.font = "16px Arial";
-                ctx.fillText(`${className} ${score}%`, xmin + 5, ymin - 5);
+                ctx.beginPath();
+                ctx.roundRect(xmin, ymin - 24, textW, 22, 6);
+                ctx.fill();
+
+                ctx.fillStyle = isDup ? '#0f0e17' : 'white';
+                ctx.font = 'bold 12px Nunito, sans-serif';
+                ctx.fillText(label, xmin + 8, ymin - 7);
             }
 
             if (!isVideoRunning) showResults(finalClasses);
@@ -289,42 +581,39 @@
     document.getElementById('cam-btn').addEventListener('click', async () => {
         if (isVideoRunning) {
             video.srcObject.getTracks().forEach(t => t.stop());
-            video.style.display = "none";
-            canvas.style.display = "none";
-            document.getElementById('cam-btn').innerText = "Start Camera";
+            video.style.display = 'none';
+            document.getElementById('cam-btn').innerHTML = '📷 Start Camera';
             isVideoRunning = false;
         } else {
-            image.style.display = "none";
+            imageEl.style.display = 'none';
+            placeholder.style.display = 'none';
             document.getElementById('results-panel').style.display = 'none';
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
             video.srcObject = stream;
-            video.style.display = "block";
-            canvas.style.display = "block";
-            document.getElementById('cam-btn').innerText = "Stop Camera";
+            video.style.display = 'block';
+            document.getElementById('cam-btn').innerHTML = '⏹ Stop Camera';
             video.onloadeddata = () => { isVideoRunning = true; detectFrame(video); };
         }
     });
 
-    document.getElementById('upload-input').addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            if (isVideoRunning) document.getElementById('cam-btn').click();
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                image.src = e.target.result;
-                image.style.display = "block";
-                canvas.style.display = "block";
-                image.onload = () => {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    detectFrame(image);
-                };
+    document.getElementById('upload-input').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (isVideoRunning) document.getElementById('cam-btn').click();
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            imageEl.src = ev.target.result;
+            imageEl.style.display = 'block';
+            placeholder.style.display = 'none';
+            imageEl.onload = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                detectFrame(imageEl);
             };
-            reader.readAsDataURL(file);
-        }
+        };
+        reader.readAsDataURL(file);
     });
 
     loadModel();
 </script>
-
 </body>
 </html>
