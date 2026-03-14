@@ -559,22 +559,20 @@ async function detect(src){
       ctx.strokeRect(xmin,ymin,rW,rH);
       ctx.shadowBlur=0;
 
-      // Place label below top edge if too close
+      // Label position
       const lx = xmin;
       const ly = ymin > th + 4 ? ymin - th - 2 : ymin + 2;
 
-      // Background
-      ctx.fillStyle = 'rgba(0,0,0,0.88)';
-      ctx.fillRect(lx, ly, tw, th);
+      const emoji = emojiMap[name] || '';
+      const fullLabel = emoji + ' ' + label;
 
-      // Colored accent strip
-      ctx.fillStyle = col;
-      ctx.fillRect(lx, ly, 5, th);
-
-      // White bold text — drawn last so nothing covers it
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 14px Arial';
-      ctx.fillText(label, lx + 10, ly + 18);
+      // Draw text with thick colored outline for visibility (no background)
+      ctx.font = 'bold 15px Arial';
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = isDup ? '#006630' : '#7a0010';
+      ctx.strokeText(fullLabel, lx + 4, ly + 18);
+      ctx.fillStyle = isDup ? '#00ffaa' : '#ffdd00';
+      ctx.fillText(fullLabel, lx + 4, ly + 18);
     }
     if(!isRunning)showResults(finalCls);
   }
