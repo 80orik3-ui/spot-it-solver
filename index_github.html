@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spot It! AI Solver</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 { color: #ff4757; }
+        .container {
+            position: relative;
+            display: inline-block;
+            margin-top: 20px;
+            max-width: 100%;
+        }
+        video, img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: none;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .controls { margin-top: 20px; }
+        button, label.upload-btn {
+            background-color: #2ed573;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            display: inline-block;
+            transition: 0.3s;
+        }
+        button:hover, label.upload-btn:hover { background-color: #27ae60; }
+        input[type="file"] { display: none; }
+        #status { margin-top: 15px; font-weight: bold; color: #57606f; }
+    </style>
+</head>
+<body>
+
+    <h1>🔍 Spot It! AI Solver</h1>
+    <p>Find the matching symbols instantly using YOLOv8!</p>
+
+    <div class="controls">
+        <button id="cam-btn">Start Camera</button>
+        <label class="upload-btn">
+            Upload Image <input type="file" id="upload-input" accept="image/*">
+        </label>
+    </div>
+
+    <div id="status">Loading model, please wait...</div>
+
+    <div class="container" id="media-container">
+        <video id="video" autoplay playsinline></video>
+        <img id="image" />
+        <canvas id="canvas"></canvas>
+    </div>
+
+<script>
+    // --- Configuration ---
+    const classNames = [
+        "anchor", "apple", "baby_bottle", "bird", "bomb", "cactus", "candle",
+        "carrot", "cat", "cheese", "clock", "clown", "dinosaur", "dog", "dolphin",
+        "dragon", "exclamation_point", "eye", "fire", "flower", "four_leaf_clover",
+        "ghost", "green_splat", "hammer", "hand", "heart", "ice_cube", "igloo",
+        "key", "knight", "ladybug", "leaf", "light_bulb", "lightning", "lips",
+        "lock", "moon", "orange_man", "pencil", "question_mark", "scissors",
+        "skull", "snowflake", "snowman", "spider", "spider_web", "stop_sign",
+        "sun", "sunglasses", "target", "taxi", "tortoise", "treble_clef", "tree",
+        "water_drop", "yin_yang", "zebra"
+    ]; // 57 classes
+
+    const modelPath = './yolov8_tfjs/model.json';
+    
+    let model;
+    const video = document.getElementById('video');
+    const image = document.getElementById('image');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const statusText = document.getElementById('status');
+    let isVideoRunning = false;
+
+    // Load the YOLOv8 TF.js Model
+    async function loadModel() {
+        try {
+            model = await tf.loadGraphModel(modelPath);
+            statusText.innerText = "Model Loaded Successfully! Ready to play.";
+        } catch (error) {
+            statusText.innerText = "Error loading model. Check the console.";
+            console.error("Model load error:", error);
+        }
+    }
+
+    // Process Image/Video and run inference
+    async function detectFrame(sourceElement) {
+        if (!model) return;
+
+        // Set canvas dimensions to match the source
+        canvas.width = sourceElement.clientWidth || sourceElement.width;
+        canvas.height = sourceElement.clientHeight || sourceElement.height;
+        
+        const [modelWidth, modelHeight] = [640, 640]; // YOLOv8 default input size
+
+        tf.engine().startScope(); // Clean up memory automatically
+
+        // Preprocess image
+        const tfImg = tf.browser.fromPixels(sourceElement);
+        const resized = tf.image.resizeBilinear(tfImg, [modelWidth, modelHeight]);
+        const normalized = resized.div(255.0);
+        const input = normalized.expandDims(0);
+
+        // Run Inference
+        const predictions = await model.executeAsync(input);
+        
+        // Parse YOLOv8 Output Shape: [1, 4 + num_classes, 8400]
+        const transRes = predictions.transpose([0, 2, 1]).squeeze(); // [8400, 4 + classes]
+        
+        const boxes = [];
+        const scores = [];
+        const classes = [];
+
+        // Extract raw data
+        const rawData = transRes.arraySync();
+        for (let i = 0; i < rawData.length; i++) {
+            const row = rawData[i];
+            const boxCoords = row.slice(0, 4); // cx, cy, w, h
+            const classScores = row.slice(4);
+            const maxScore = Math.max(...classScores);
+            const classId = classScores.indexOf(maxScore);
+
+            if (maxScore > 0.3) { // Confidence threshold
+                // Convert center x, center y, w, h to xmin, ymin, xmax, ymax
+                const cx = boxCoords[0], cy = boxCoords[1], w = boxCoords[2], h = boxCoords[3];
+                const xmin = cx - w / 2;
+                const ymin = cy - h / 2;
+                const xmax = cx + w / 2;
+                const ymax = cy + h / 2;
+
+                boxes.push([ymin, xmin, ymax, xmax]);
+                scores.push(maxScore);
+                classes.push(classId);
+            }
+        }
+
+        // Apply Non-Maximum Suppression (NMS) to remove overlapping boxes
+        if (boxes.length > 0) {
+            const nmsIndices = await tf.image.nonMaxSuppressionAsync(
+                boxes, scores, 20, 0.45, 0.3 // maxOutputSize, iouThreshold, scoreThreshold
+            );
+            const selectedIndices = nmsIndices.dataSync();
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw final bounding boxes
+            for (let i = 0; i < selectedIndices.length; i++) {
+                const idx = selectedIndices[i];
+                const box = boxes[idx];
+                const score = (scores[idx] * 100).toFixed(1);
+                const className = classNames[classes[idx]] || "Unknown";
+
+                // Scale boxes back to original image/video size
+                const ymin = (box[0] / modelHeight) * canvas.height;
+                const xmin = (box[1] / modelWidth) * canvas.width;
+                const ymax = (box[2] / modelHeight) * canvas.height;
+                const xmax = (box[3] / modelWidth) * canvas.width;
+                const rectW = xmax - xmin;
+                const rectH = ymax - ymin;
+
+                // Draw Box
+                ctx.strokeStyle = "#ff4757";
+                ctx.lineWidth = 3;
+                ctx.strokeRect(xmin, ymin, rectW, rectH);
+
+                // Draw Label
+                ctx.fillStyle = "#ff4757";
+                ctx.fillRect(xmin, ymin - 20, ctx.measureText(className).width + 45, 20);
+                ctx.fillStyle = "white";
+                ctx.font = "16px Arial";
+                ctx.fillText(`${className} ${score}%`, xmin + 5, ymin - 5);
+            }
+        } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        tf.engine().endScope(); // Free memory
+
+        if (isVideoRunning) {
+            requestAnimationFrame(() => detectFrame(video));
+        }
+    }
+
+    // Camera Controls
+    document.getElementById('cam-btn').addEventListener('click', async () => {
+        if (isVideoRunning) {
+            video.srcObject.getTracks().forEach(track => track.stop());
+            video.style.display = "none";
+            canvas.style.display = "none";
+            document.getElementById('cam-btn').innerText = "Start Camera";
+            isVideoRunning = false;
+        } else {
+            image.style.display = "none";
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+            video.srcObject = stream;
+            video.style.display = "block";
+            canvas.style.display = "block";
+            document.getElementById('cam-btn').innerText = "Stop Camera";
+            
+            video.onloadeddata = () => {
+                isVideoRunning = true;
+                detectFrame(video);
+            };
+        }
+    });
+
+    // Image Upload Controls
+    document.getElementById('upload-input').addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            if (isVideoRunning) document.getElementById('cam-btn').click(); // Stop camera if running
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                image.src = e.target.result;
+                image.style.display = "block";
+                canvas.style.display = "block";
+                image.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    detectFrame(image);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Initialize
+    loadModel();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+description: Ultralytics best model trained on /content/spot-it--17/data.yaml
+author: Ultralytics
+date: '2026-03-13T22:37:21.757751'
+version: 8.4.21
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 32
+task: detect
+batch: 1
+imgsz:
+- 640
+- 640
+names:
+  0: anchor
+  1: apple
+  2: baby_bottle
+  3: bird
+  4: bomb
+  5: cactus
+  6: candle
+  7: carrot
+  8: cat
+  9: cheese
+  10: clock
+  11: clown
+  12: dinosaur
+  13: dog
+  14: dolphin
+  15: dragon
+  16: exclamation_point
+  17: eye
+  18: fire
+  19: flower
+  20: four_leaf_clover
+  21: ghost
+  22: green_splat
+  23: hammer
+  24: hand
+  25: heart
+  26: ice_cube
+  27: igloo
+  28: key
+  29: knight
+  30: ladybug
+  31: leaf
+  32: light_bulb
+  33: lightning
+  34: lips
+  35: lock
+  36: moon
+  37: orange man
+  38: pencil
+  39: question_mark
+  40: scissors
+  41: skull
+  42: snowflake
+  43: snowman
+  44: spider
+  45: spider_web
+  46: stop_sign
+  47: sun
+  48: sunglasses
+  49: target
+  50: taxi
+  51: tortoise
+  52: treble_clef
+  53: tree
+  54: water_drop
+  55: yin_yang
+  56: zebra
+args:
+  batch: 1
+  half: false
+  int8: false
+  nms: false
+channels: 3
+end2end: false
