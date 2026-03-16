@@ -11,247 +11,236 @@
 :root{
   --red:#ff4757;--orange:#ff8c00;--yellow:#ffd32a;
   --green:#2ed573;--teal:#1e90ff;--purple:#a55eea;--pink:#ff6b9d;
-  --bg:#fffdf7;--card:#ffffff;--text:#2d2d44;--muted:#9898b0;
-  --shadow:rgba(45,45,68,0.10);
+  --bg:#fffcf5;--card:#ffffff;--text:#2d2d44;--muted:#9898b0;
+  --border:rgba(128,128,160,0.14);
+  --shadow:rgba(45,45,68,0.09);
 }
-body.dark{--bg:#16161f;--card:#1e1e2e;--text:#f0f0ff;--muted:#6b6b8a;--shadow:rgba(0,0,0,0.4)}
+body.dark{
+  --bg:#13131e;--card:#1c1c2e;--text:#f0f0ff;--muted:#6b6b8a;
+  --border:rgba(255,255,255,0.07);--shadow:rgba(0,0,0,0.4);
+}
 html{scroll-behavior:smooth}
-body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .35s,color .35s}
 
-/* BG */
-.bg-shapes{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.shape{position:absolute;border-radius:50%;opacity:.06;animation:drift linear infinite}
-.shape:nth-child(1){width:300px;height:300px;background:var(--red);top:-80px;left:-80px;animation-duration:18s}
-.shape:nth-child(2){width:200px;height:200px;background:var(--yellow);top:30%;right:-60px;animation-duration:22s;animation-delay:-5s}
-.shape:nth-child(3){width:250px;height:250px;background:var(--teal);bottom:-60px;left:20%;animation-duration:20s;animation-delay:-8s}
-.shape:nth-child(4){width:180px;height:180px;background:var(--purple);top:60%;left:-50px;animation-duration:25s;animation-delay:-12s}
-.shape:nth-child(5){width:220px;height:220px;background:var(--pink);bottom:10%;right:10%;animation-duration:17s;animation-delay:-3s}
-@keyframes drift{0%{transform:translate(0,0) rotate(0deg)}25%{transform:translate(30px,-20px) rotate(90deg)}50%{transform:translate(-20px,30px) rotate(180deg)}75%{transform:translate(20px,20px) rotate(270deg)}100%{transform:translate(0,0) rotate(360deg)}}
+/* ── BG BLOBS ── */
+.bg-blobs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.blob{position:absolute;border-radius:50%;opacity:.055;animation:blobDrift linear infinite}
+.blob:nth-child(1){width:380px;height:380px;background:var(--red);top:-120px;left:-100px;animation-duration:22s}
+.blob:nth-child(2){width:260px;height:260px;background:var(--yellow);top:25%;right:-80px;animation-duration:28s;animation-delay:-7s}
+.blob:nth-child(3){width:320px;height:320px;background:var(--teal);bottom:-100px;left:15%;animation-duration:24s;animation-delay:-11s}
+.blob:nth-child(4){width:200px;height:200px;background:var(--purple);top:55%;left:-60px;animation-duration:30s;animation-delay:-15s}
+.blob:nth-child(5){width:280px;height:280px;background:var(--pink);bottom:5%;right:5%;animation-duration:20s;animation-delay:-4s}
+@keyframes blobDrift{0%{transform:translate(0,0) rotate(0deg)}25%{transform:translate(25px,-18px) rotate(90deg)}50%{transform:translate(-18px,25px) rotate(180deg)}75%{transform:translate(18px,18px) rotate(270deg)}100%{transform:translate(0,0) rotate(360deg)}}
 
-/* CONFETTI */
-#confetti-container{position:fixed;inset:0;pointer-events:none;z-index:9999}
-.confetti-piece{position:absolute;top:-10px;animation:confettiFall linear forwards}
-@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
+/* ── CONFETTI ── */
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:9999}
+.cp{position:absolute;top:-12px;animation:cpFall linear forwards}
+@keyframes cpFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
 
-/* RAINBOW BAR */
-.rainbow-bar{height:6px;background:linear-gradient(90deg,#ff4757,#ff8c00,#ffd32a,#2ed573,#1e90ff,#a55eea,#ff6b9d);background-size:200% auto;animation:rainbow-slide 3s linear infinite}
-@keyframes rainbow-slide{0%{background-position:0%}100%{background-position:200%}}
+/* ── RAINBOW ── */
+.rainbow-bar{height:7px;background:linear-gradient(90deg,#ff4757,#ff8c00,#ffd32a,#2ed573,#1e90ff,#a55eea,#ff6b9d);background-size:200%;animation:rbSlide 3s linear infinite}
+@keyframes rbSlide{0%{background-position:0%}100%{background-position:200%}}
 
-/* SHELL */
-.shell{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:24px 18px 80px}
+/* ── LAYOUT ── */
+.shell{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:36px 24px 100px}
 
-/* TOPBAR */
-.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:10px}
-.logo-area{display:flex;align-items:center;gap:12px}
-.logo-icon{width:54px;height:54px;background:linear-gradient(135deg,var(--red),var(--purple));border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 8px 24px rgba(255,71,87,.3);animation:logo-bounce 2.5s ease-in-out infinite}
-@keyframes logo-bounce{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-7px) rotate(3deg)}}
-.logo-text h1{font-family:'Fredoka One',cursive;font-size:clamp(1.4rem,4vw,2rem);line-height:1}
-.logo-text p{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.5px}
-.topbar-actions{display:flex;gap:8px}
-.icon-btn{width:40px;height:40px;border-radius:11px;border:2px solid rgba(128,128,160,.18);background:var(--card);color:var(--text);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 2px 8px var(--shadow)}
-.icon-btn:hover{transform:scale(1.1);border-color:var(--yellow)}
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:40px;flex-wrap:wrap;gap:14px}
+.logo-area{display:flex;align-items:center;gap:16px}
+.logo-icon{width:62px;height:62px;background:linear-gradient(135deg,var(--red),var(--purple));border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 10px 28px rgba(255,71,87,.32);animation:logoBounce 2.8s ease-in-out infinite;flex-shrink:0}
+@keyframes logoBounce{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-9px) rotate(3deg)}}
+.logo-text h1{font-family:'Fredoka One',cursive;font-size:clamp(1.7rem,4.5vw,2.5rem);line-height:1.05;letter-spacing:-.3px}
+.logo-text p{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.6px;margin-top:3px}
+.topbar-actions{display:flex;gap:10px;align-items:center}
+.icon-btn{width:44px;height:44px;border-radius:13px;border:2px solid var(--border);background:var(--card);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 3px 10px var(--shadow);flex-shrink:0}
+.icon-btn:hover{transform:scale(1.1);border-color:var(--yellow);box-shadow:0 6px 18px var(--shadow)}
 
-/* SESSION STRIP */
-.session-strip{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
-.sc{flex:1;min-width:90px;background:var(--card);border-radius:14px;padding:12px 14px;box-shadow:0 4px 14px var(--shadow);text-align:center;border:2px solid transparent;transition:border-color .3s}
-.sc:hover{border-color:var(--yellow)}
-.sc-val{font-family:'Fredoka One',cursive;font-size:1.8rem;line-height:1;background:linear-gradient(135deg,var(--orange),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.sc-lbl{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-top:2px}
+/* ── SESSION STRIP ── */
+.session-strip{display:flex;gap:14px;margin-bottom:36px;flex-wrap:wrap}
+.sc{flex:1;min-width:100px;background:var(--card);border-radius:18px;padding:18px 16px;box-shadow:0 5px 20px var(--shadow);text-align:center;border:2px solid var(--border);transition:border-color .25s,transform .2s}
+.sc:hover{border-color:var(--yellow);transform:translateY(-2px)}
+.sc-val{font-family:'Fredoka One',cursive;font-size:2.2rem;line-height:1;background:linear-gradient(135deg,var(--orange),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sc-lbl{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-top:4px}
 
-/* STATUS */
-.status-wrap{text-align:center;margin-bottom:20px}
-.status-pill{display:inline-flex;align-items:center;gap:9px;border-radius:50px;padding:9px 20px;font-size:13px;font-weight:800;background:var(--card);border:2.5px solid rgba(128,128,160,.2);color:var(--muted);box-shadow:0 3px 12px var(--shadow);transition:all .4s}
+/* ── STATUS ── */
+.status-wrap{text-align:center;margin-bottom:32px}
+.status-pill{display:inline-flex;align-items:center;gap:10px;border-radius:50px;padding:11px 24px;font-size:13px;font-weight:800;background:var(--card);border:2.5px solid var(--border);color:var(--muted);box-shadow:0 4px 14px var(--shadow);transition:all .4s}
 .status-pill.ready{border-color:var(--green);color:var(--green);background:rgba(46,213,115,.06)}
 .status-pill.error{border-color:var(--red);color:var(--red)}
 .s-dot{width:9px;height:9px;border-radius:50%;background:currentColor;flex-shrink:0}
-.status-pill.ready .s-dot{animation:pdot 1.5s infinite}
+.status-pill.ready .s-dot{animation:pdot 1.6s infinite}
 @keyframes pdot{0%,100%{transform:scale(1)}50%{transform:scale(1.8);opacity:.3}}
 
-/* ══ MODE TABS ══ */
-.mode-tabs{display:flex;gap:0;background:var(--card);border-radius:18px;padding:6px;box-shadow:0 4px 18px var(--shadow);margin-bottom:22px;border:2px solid rgba(128,128,160,.1)}
-.mode-tab{flex:1;padding:12px 10px;border-radius:13px;border:none;font-family:'Fredoka One',cursive;font-size:16px;cursor:pointer;transition:all .25s;background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px}
-.mode-tab.active{background:linear-gradient(135deg,var(--teal),var(--purple));color:#fff;box-shadow:0 4px 16px rgba(79,142,247,.35)}
+/* ── MODE TABS ── */
+.mode-tabs{display:flex;gap:0;background:var(--card);border-radius:20px;padding:7px;box-shadow:0 5px 20px var(--shadow);margin-bottom:32px;border:2px solid var(--border)}
+.mode-tab{flex:1;padding:14px 10px;border-radius:14px;border:none;font-family:'Fredoka One',cursive;font-size:17px;cursor:pointer;transition:all .26s;background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:9px}
+.mode-tab.active{background:linear-gradient(135deg,var(--teal),var(--purple));color:#fff;box-shadow:0 5px 18px rgba(79,142,247,.38)}
 .mode-tab:not(.active):hover{background:rgba(128,128,160,.1);color:var(--text)}
 
-/* ══ PANELS ══ */
-.panel{display:none}
-.panel.active{display:block}
+/* ── PANELS ── */
+.panel{display:none}.panel.active{display:block}
 
-/* ── SHARED SETTINGS ── */
-.settings-bar{background:var(--card);border-radius:14px;padding:12px 18px;margin-bottom:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:0 3px 12px var(--shadow);border:2px solid rgba(128,128,160,.08)}
-.si{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;color:var(--muted)}
-.si label{white-space:nowrap}
-input[type=range]{-webkit-appearance:none;width:90px;height:5px;background:linear-gradient(90deg,var(--teal),var(--purple));border-radius:3px;outline:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--yellow);border:3px solid var(--card);cursor:pointer}
-.cv{font-family:'Fredoka One',cursive;font-size:15px;background:linear-gradient(135deg,var(--orange),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;min-width:34px}
-.tog{width:40px;height:22px;border-radius:50px;background:rgba(128,128,160,.22);position:relative;cursor:pointer;transition:background .3s;border:none;flex-shrink:0}
+/* ── SETTINGS CARD ── */
+.settings-card{background:var(--card);border-radius:18px;padding:20px 24px;margin-bottom:24px;box-shadow:0 5px 20px var(--shadow);border:2px solid var(--border)}
+.settings-card h3{font-family:'Fredoka One',cursive;font-size:15px;color:var(--muted);margin-bottom:16px;letter-spacing:.3px}
+.settings-row{display:flex;align-items:center;flex-wrap:wrap;gap:20px}
+.si{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:800;color:var(--muted)}
+.si label{white-space:nowrap;cursor:default}
+input[type=range]{-webkit-appearance:none;width:95px;height:6px;background:linear-gradient(90deg,var(--teal),var(--purple));border-radius:3px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--yellow);border:3px solid var(--card);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+.cv{font-family:'Fredoka One',cursive;font-size:16px;background:linear-gradient(135deg,var(--orange),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;min-width:38px}
+.tog{width:42px;height:23px;border-radius:50px;background:rgba(128,128,160,.22);position:relative;cursor:pointer;transition:background .3s;border:none;flex-shrink:0}
 .tog.on{background:linear-gradient(135deg,var(--green),#00b876)}
-.tog::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .3s;box-shadow:0 2px 5px rgba(0,0,0,.2)}
-.tog.on::after{left:21px}
+.tog::after{content:'';position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:#fff;transition:left .3s;box-shadow:0 2px 5px rgba(0,0,0,.2)}
+.tog.on::after{left:22px}
 
-/* ── MEDIA CARD ── */
-.media-card{background:var(--card);border-radius:22px;overflow:hidden;position:relative;min-height:240px;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 46px var(--shadow);margin-bottom:18px;border:3px solid rgba(255,211,42,.28);transition:border-color .3s}
-.media-card:hover{border-color:rgba(255,211,42,.55)}
-.scanning-line{position:absolute;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--green),transparent);z-index:3;display:none;animation:scanline 1.8s ease-in-out infinite;box-shadow:0 0 12px var(--green)}
-@keyframes scanline{0%{top:0}100%{top:calc(100% - 3px)}}
-.media-card.scanning .scanning-line{display:block}
-.ph{text-align:center;padding:50px 20px;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px}
-.ph-circle{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#fff0d4,#ffd6e8);border:4px solid #ffe0c8;display:flex;align-items:center;justify-content:center;font-size:40px;animation:spin-float 4s ease-in-out infinite;box-shadow:0 8px 26px rgba(255,140,0,.16)}
-@keyframes spin-float{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-13px) rotate(4deg)}}
-.ph h3{font-family:'Fredoka One',cursive;font-size:18px}
-.ph p{font-size:12px;color:var(--muted);max-width:220px;line-height:1.6}
-video,#img-el,#img-el2{width:100%;display:none;border-radius:20px;z-index:1;position:relative}
-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;border-radius:20px}
-
-/* ── BTN ── */
-.btns{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}
-.btn{font-family:'Fredoka One',cursive;font-size:16px;border:none;border-radius:14px;padding:11px 22px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all .18s;border-bottom:4px solid rgba(0,0,0,.14)}
-.btn:hover{transform:translateY(-3px)}
-.btn:active{transform:translateY(2px);border-bottom-width:1px}
-.btn-cam{background:linear-gradient(135deg,#4f8ef7,#7b5cf0);color:#fff;box-shadow:0 6px 20px rgba(79,142,247,.38)}
-.btn-freeze{background:linear-gradient(135deg,#2ed573,#00b876);color:#fff;box-shadow:0 6px 20px rgba(46,213,115,.38);display:none}
-.btn-autostop{background:linear-gradient(135deg,#ff8c00,#ffd32a);color:#fff;box-shadow:0 6px 20px rgba(255,140,0,.35)}
-.btn-autostop.active-auto{background:linear-gradient(135deg,#ff4757,#c0392b)}
-.btn-upload{background:linear-gradient(135deg,#ff6b9d,#ff4757);color:#fff;box-shadow:0 6px 20px rgba(255,71,87,.38)}
-.btn-reset{background:linear-gradient(135deg,#ffd32a,#ff8c00);color:#fff;box-shadow:0 6px 20px rgba(255,140,0,.35)}
+/* ── BTNS ── */
+.btns{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+.btn{font-family:'Fredoka One',cursive;font-size:17px;border:none;border-radius:16px;padding:14px 26px;cursor:pointer;display:inline-flex;align-items:center;gap:9px;transition:all .2s;border-bottom:5px solid rgba(0,0,0,.14);position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.11);opacity:0;transition:opacity .18s}
+.btn:hover::after{opacity:1}.btn:hover{transform:translateY(-3px)}.btn:active{transform:translateY(1px);border-bottom-width:2px}
+.btn-cam{background:linear-gradient(135deg,#4f8ef7,#7b5cf0);color:#fff;box-shadow:0 7px 24px rgba(79,142,247,.38)}
+.btn-freeze{background:linear-gradient(135deg,#2ed573,#00b876);color:#fff;box-shadow:0 7px 24px rgba(46,213,115,.38);display:none}
+.btn-upload{background:linear-gradient(135deg,#ff6b9d,#ff4757);color:#fff;box-shadow:0 7px 24px rgba(255,71,87,.38)}
+.btn-reset{background:linear-gradient(135deg,#ffd32a,#ff8c00);color:#fff;box-shadow:0 7px 24px rgba(255,140,0,.35)}
 input[type=file]{display:none}
 
-/* ── LIVE STATS TICKER ── */
-.live-bar{
-  background:var(--card);border-radius:14px;padding:12px 18px;
-  margin-bottom:18px;display:none;
-  box-shadow:0 3px 12px var(--shadow);border:2px solid rgba(46,213,115,.25);
-}
-.live-bar.visible{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
-.live-stat{font-size:13px;font-weight:800;color:var(--muted);display:flex;align-items:center;gap:6px}
-.live-stat span{font-family:'Fredoka One',cursive;font-size:18px;background:linear-gradient(135deg,var(--green),#00b876);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.live-dot{width:8px;height:8px;border-radius:50%;background:var(--red);animation:blink 1s infinite;flex-shrink:0}
-.live-dot.running{background:var(--green)}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+/* ── LIVE BAR ── */
+.live-bar{display:none;background:var(--card);border-radius:16px;padding:14px 22px;margin-bottom:24px;box-shadow:0 4px 16px var(--shadow);border:2.5px solid rgba(46,213,115,.28);align-items:center;gap:20px;flex-wrap:wrap}
+.live-bar.visible{display:flex}
+.live-pill{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:800;color:var(--muted)}
+.live-pill span{font-family:'Fredoka One',cursive;font-size:20px;background:linear-gradient(135deg,var(--green),#00b876);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.rec-dot{width:9px;height:9px;border-radius:50%;background:var(--red);animation:recBlink 1s infinite;flex-shrink:0}
+.rec-dot.on{background:var(--green)}
+@keyframes recBlink{0%,100%{opacity:1}50%{opacity:.15}}
+
+/* ── COUNTDOWN OVERLAY ── */
+.countdown-overlay{position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:10;display:none;align-items:center;justify-content:center;border-radius:20px;backdrop-filter:blur(3px)}
+.countdown-overlay.active{display:flex}
+.countdown-num{font-family:'Fredoka One',cursive;font-size:120px;color:#fff;text-shadow:0 0 40px var(--green),0 4px 20px rgba(0,0,0,.5);animation:countPop .9s ease-in-out}
+@keyframes countPop{0%{transform:scale(1.5);opacity:0}40%{transform:scale(1);opacity:1}85%{transform:scale(1);opacity:1}100%{transform:scale(.7);opacity:0}}
 
 /* ── ALERT BANNER ── */
-.alert-banner{
-  display:none;padding:12px 18px;border-radius:14px;margin-bottom:14px;
-  font-weight:800;font-size:13px;
-  border:2.5px solid var(--green);background:rgba(46,213,115,.1);color:var(--green);
-  animation:slideDown .3s ease;
-}
+.alert-banner{display:none;padding:14px 20px;border-radius:14px;margin-bottom:20px;font-weight:800;font-size:13px;border:2.5px solid var(--green);background:rgba(46,213,115,.09);color:var(--green);animation:slideDown .3s ease}
 .alert-banner.visible{display:flex;align-items:center;gap:10px}
 .alert-banner.fail{border-color:var(--red);background:rgba(255,71,87,.08);color:var(--red)}
-@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 
-/* ── RESULTS ── */
-#results,#results2{display:none;border-radius:22px;overflow:hidden;box-shadow:0 12px 46px var(--shadow);margin-bottom:18px;border:3px solid transparent;animation:bounceIn .45s cubic-bezier(.16,1,.3,1) both}
-@keyframes bounceIn{0%{opacity:0;transform:scale(.82) translateY(22px)}60%{transform:scale(1.04)}100%{opacity:1;transform:scale(1) translateY(0)}}
-.r-result.ok-result{border-color:var(--green)}
-.r-result.fail-result{border-color:#ffb3c1}
-.r-head{padding:16px 24px;display:flex;align-items:center;gap:12px}
-.r-head.ok{background:linear-gradient(135deg,#d4fcea,#b8f5d8)}
-.r-head.fail{background:linear-gradient(135deg,#ffe0e8,#ffc8d4)}
-.r-hi{font-size:36px;animation:spin-once .55s ease-out}
-@keyframes spin-once{from{transform:rotate(-25deg) scale(.5)}to{transform:rotate(0) scale(1)}}
-.r-ht{font-family:'Fredoka One',cursive;font-size:20px;color:var(--text)}
-.r-hs{font-size:12px;color:var(--muted);font-weight:700;margin-top:2px}
-.r-body{background:var(--card);padding:18px 24px}
-.r-meta{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);font-weight:800;margin-bottom:14px;flex-wrap:wrap}
-.chip{border-radius:50px;padding:3px 12px;font-size:13px;font-weight:900;color:#fff}
-.chip-o{background:linear-gradient(135deg,var(--orange),var(--yellow));box-shadow:0 2px 8px rgba(255,140,0,.28)}
-.chip-g{background:linear-gradient(135deg,var(--green),#00b876);box-shadow:0 2px 8px rgba(46,213,115,.28)}
-.dup-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:9px;list-style:none}
-.dup-item{background:linear-gradient(135deg,#f0fff8,#dcffee);border:2.5px solid var(--green);border-radius:14px;padding:9px 12px;display:flex;align-items:center;gap:9px;animation:popBounce .38s cubic-bezier(.16,1,.3,1) both;box-shadow:0 3px 12px rgba(46,213,115,.15)}
-body.dark .dup-item{background:rgba(46,213,115,.08);border-color:rgba(46,213,115,.35)}
-@keyframes popBounce{0%{opacity:0;transform:scale(.6) rotate(-4deg)}70%{transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}
-.dup-emoji{font-size:24px;flex-shrink:0}
-.dup-name{font-size:12px;font-weight:900;color:var(--text);text-transform:capitalize;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dup-x{background:var(--green);color:#fff;border-radius:50px;padding:2px 9px;font-size:11px;font-weight:900;flex-shrink:0}
-.no-dup{text-align:center;padding:10px;font-size:14px;font-weight:800;color:var(--red)}
+/* ── MEDIA CARD ── */
+.media-card{background:var(--card);border-radius:24px;overflow:hidden;position:relative;min-height:260px;display:flex;align-items:center;justify-content:center;box-shadow:0 14px 52px var(--shadow);margin-bottom:24px;border:3px solid rgba(255,211,42,.28);transition:border-color .3s}
+.media-card:hover{border-color:rgba(255,211,42,.55)}
+.scan-line{position:absolute;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--green),transparent);z-index:3;display:none;animation:scanL 1.9s ease-in-out infinite;box-shadow:0 0 14px var(--green)}
+@keyframes scanL{0%{top:0}100%{top:calc(100% - 3px)}}
+.media-card.scanning .scan-line{display:block}
+.ph{text-align:center;padding:56px 24px;z-index:1;display:flex;flex-direction:column;align-items:center;gap:16px}
+.ph-circle{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,#fff0d4,#ffd6e8);border:4px solid #ffe0c8;display:flex;align-items:center;justify-content:center;font-size:42px;animation:spinFloat 4s ease-in-out infinite;box-shadow:0 8px 28px rgba(255,140,0,.16)}
+@keyframes spinFloat{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-14px) rotate(4deg)}}
+.ph h3{font-family:'Fredoka One',cursive;font-size:20px}.ph p{font-size:13px;color:var(--muted);max-width:240px;line-height:1.65}
+video,.freeze-img,#img-el{width:100%;display:none;border-radius:20px;position:relative;z-index:1}
+canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;border-radius:20px}
 
 /* ── HISTORY ── */
-.history-section{display:none;margin-bottom:18px}
-.hist-title{font-family:'Fredoka One',cursive;font-size:16px;margin-bottom:10px}
-.history-list{display:flex;gap:9px;overflow-x:auto;padding-bottom:6px}
-.hi{flex-shrink:0;width:68px;height:68px;border-radius:12px;border:3px solid rgba(128,128,160,.18);overflow:hidden;cursor:pointer;transition:all .2s;position:relative}
+.hist-section{display:none;margin-bottom:24px}
+.hist-title{font-family:'Fredoka One',cursive;font-size:17px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.hist-list{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px}
+.hi{flex-shrink:0;width:72px;height:72px;border-radius:13px;border:3px solid var(--border);overflow:hidden;cursor:pointer;transition:all .22s;position:relative}
 .hi:hover{border-color:var(--yellow);transform:scale(1.1)}
 .hi img{width:100%;height:100%;object-fit:cover}
-.hbadge{position:absolute;bottom:2px;right:2px;background:var(--green);color:#fff;border-radius:50%;width:16px;height:16px;font-size:8px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.hbadge{position:absolute;bottom:3px;right:3px;background:var(--green);color:#fff;border-radius:50%;width:18px;height:18px;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.2)}
 .hbadge.none{background:var(--red)}
 
+/* ── RESULTS ── */
+.r-panel{display:none;border-radius:22px;overflow:hidden;box-shadow:0 14px 50px var(--shadow);margin-bottom:24px;border:3px solid transparent;animation:bounceIn .48s cubic-bezier(.16,1,.3,1) both}
+@keyframes bounceIn{0%{opacity:0;transform:scale(.82) translateY(24px)}60%{transform:scale(1.04)}100%{opacity:1;transform:scale(1) translateY(0)}}
+.r-panel.ok{border-color:var(--green)}.r-panel.fail{border-color:#ffb3c1}
+.r-head{padding:20px 26px;display:flex;align-items:center;gap:14px}
+.r-head.ok{background:linear-gradient(135deg,#d4fcea,#b8f5d8)}.r-head.fail{background:linear-gradient(135deg,#ffe0e8,#ffc8d4)}
+body.dark .r-head.ok{background:rgba(46,213,115,.15)}body.dark .r-head.fail{background:rgba(255,71,87,.12)}
+.r-icon{font-size:38px;animation:spinOnce .55s ease-out}
+@keyframes spinOnce{from{transform:rotate(-25deg) scale(.5)}to{transform:rotate(0) scale(1)}}
+.r-title{font-family:'Fredoka One',cursive;font-size:21px;color:var(--text)}
+.r-sub{font-size:12px;color:var(--muted);font-weight:700;margin-top:3px}
+.r-body{background:var(--card);padding:22px 26px}
+.r-meta{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);font-weight:800;margin-bottom:16px;flex-wrap:wrap}
+.chip{border-radius:50px;padding:3px 13px;font-size:13px;font-weight:900;color:#fff}
+.chip-o{background:linear-gradient(135deg,var(--orange),var(--yellow));box-shadow:0 2px 8px rgba(255,140,0,.28)}
+.chip-g{background:linear-gradient(135deg,var(--green),#00b876);box-shadow:0 2px 8px rgba(46,213,115,.28)}
+.dup-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;list-style:none}
+.dup-item{background:linear-gradient(135deg,#f0fff8,#dcffee);border:2.5px solid var(--green);border-radius:15px;padding:11px 14px;display:flex;align-items:center;gap:10px;animation:popBounce .38s cubic-bezier(.16,1,.3,1) both;box-shadow:0 4px 14px rgba(46,213,115,.14)}
+body.dark .dup-item{background:rgba(46,213,115,.08);border-color:rgba(46,213,115,.32)}
+@keyframes popBounce{0%{opacity:0;transform:scale(.6) rotate(-4deg)}70%{transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}
+.dup-emoji{font-size:26px;flex-shrink:0}
+.dup-name{font-size:13px;font-weight:900;color:var(--text);text-transform:capitalize;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dup-x{background:var(--green);color:#fff;border-radius:50px;padding:2px 9px;font-size:11px;font-weight:900;flex-shrink:0}
+.no-dup{text-align:center;padding:12px;font-size:14px;font-weight:800;color:var(--red)}
+
 /* ── MODAL ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:8000;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:8000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px)}
 .modal-overlay.open{display:flex;animation:fadeIn .22s ease}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.modal{background:var(--card);border-radius:22px;max-width:540px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.28);padding:24px;position:relative}
-.modal-close{position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);transition:transform .2s}
+.modal{background:var(--card);border-radius:24px;max-width:560px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 28px 90px rgba(0,0,0,.28);padding:28px;position:relative}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);transition:transform .2s}
 .modal-close:hover{transform:scale(1.2) rotate(90deg)}
-.modal h2{font-family:'Fredoka One',cursive;font-size:22px;margin-bottom:6px}
-.modal-tabs{display:flex;gap:0;background:rgba(128,128,160,.1);border-radius:12px;padding:4px;margin-bottom:18px}
-.modal-tab{flex:1;padding:8px;border-radius:9px;border:none;font-family:'Fredoka One',cursive;font-size:14px;cursor:pointer;transition:all .2s;background:transparent;color:var(--muted)}
-.modal-tab.active{background:var(--card);color:var(--text);box-shadow:0 2px 8px var(--shadow)}
-.modal-panel{display:none}
-.modal-panel.active{display:block}
-.feat-item{display:flex;gap:12px;margin-bottom:14px;padding-bottom:14px;border-bottom:1.5px solid rgba(128,128,160,.1)}
+.modal h2{font-family:'Fredoka One',cursive;font-size:23px;margin-bottom:8px}
+.modal-tabs{display:flex;gap:0;background:rgba(128,128,160,.1);border-radius:13px;padding:5px;margin-bottom:20px}
+.modal-tab{flex:1;padding:9px;border-radius:9px;border:none;font-family:'Fredoka One',cursive;font-size:14px;cursor:pointer;transition:all .2s;background:transparent;color:var(--muted)}
+.modal-tab.active{background:var(--card);color:var(--text);box-shadow:0 2px 9px var(--shadow)}
+.modal-panel{display:none}.modal-panel.active{display:block}
+.feat-item{display:flex;gap:14px;margin-bottom:16px;padding-bottom:16px;border-bottom:1.5px solid var(--border)}
 .feat-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
-.feat-icon{font-size:24px;width:40px;height:40px;background:rgba(128,128,160,.08);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.feat-text h4{font-size:13px;font-weight:900;color:var(--text);margin-bottom:2px}
-.feat-text p{font-size:11px;color:var(--muted);line-height:1.6}
+.feat-icon{font-size:24px;width:42px;height:42px;background:rgba(128,128,160,.08);border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.feat-text h4{font-size:13px;font-weight:900;color:var(--text);margin-bottom:3px}
+.feat-text p{font-size:12px;color:var(--muted);line-height:1.65}
 
-/* TOAST */
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--text);color:var(--bg);border-radius:50px;padding:11px 22px;font-weight:800;font-size:13px;box-shadow:0 8px 28px rgba(0,0,0,.2);z-index:9000;transition:transform .4s cubic-bezier(.16,1,.3,1);white-space:nowrap}
+/* ── TOAST ── */
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(130px);background:var(--text);color:var(--bg);border-radius:50px;padding:12px 24px;font-weight:800;font-size:13px;box-shadow:0 10px 32px rgba(0,0,0,.22);z-index:9000;transition:transform .42s cubic-bezier(.16,1,.3,1);white-space:nowrap}
 #toast.show{transform:translateX(-50%) translateY(0)}
 
-body.dark .ph-circle{background:linear-gradient(135deg,#2a2040,#1e2a40);border-color:#3a3060}
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-thumb{background:rgba(128,128,160,.28);border-radius:3px}
+body.dark .ph-circle{background:linear-gradient(135deg,#28203a,#1e2840);border-color:#3a3060}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:rgba(128,128,160,.26);border-radius:3px}
 </style>
 </head>
 <body>
 
-<div class="bg-shapes">
-  <div class="shape"></div><div class="shape"></div>
-  <div class="shape"></div><div class="shape"></div><div class="shape"></div>
-</div>
-<div id="confetti-container"></div>
+<div class="bg-blobs"><div class="blob"></div><div class="blob"></div><div class="blob"></div><div class="blob"></div><div class="blob"></div></div>
+<div id="confetti"></div>
 <div id="toast"></div>
 
-<!-- HELP MODAL -->
+<!-- ── HELP MODAL ── -->
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
     <button class="modal-close" id="modal-close">✕</button>
     <h2>✨ Features Guide</h2>
     <div class="modal-tabs">
-      <button class="modal-tab active" data-mtab="live">📹 Live Mode</button>
-      <button class="modal-tab" data-mtab="photo">🖼️ Photo Mode</button>
-      <button class="modal-tab" data-mtab="shared">⚙️ Shared</button>
+      <button class="modal-tab active" data-mt="live">📹 Live</button>
+      <button class="modal-tab" data-mt="photo">🖼️ Photo</button>
+      <button class="modal-tab" data-mt="shared">⚙️ Settings</button>
     </div>
-
-    <div class="modal-panel active" id="mtab-live">
-      <div class="feat-item"><div class="feat-icon">📷</div><div class="feat-text"><h4>Start / Stop Camera</h4><p>Opens your device camera with real-time symbol detection. Bounding boxes update live on every frame — green for duplicates, red for unique symbols.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">📸</div><div class="feat-text"><h4>Freeze & Analyze</h4><p>Pauses the live feed and runs a full analysis on that exact frame — counts symbols, shows duplicates, fires confetti, updates session stats, and saves to history.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">🤖</div><div class="feat-text"><h4>Auto-Freeze on Match</h4><p>When active, the camera automatically freezes and analyzes the frame the moment the AI detects a duplicate symbol — no need to tap anything!</p></div></div>
-      <div class="feat-item"><div class="feat-icon">📊</div><div class="feat-text"><h4>Live Stats Bar</h4><p>Shows real-time stats while the camera runs: how many symbols the AI currently sees, how many are duplicates, and a live recording indicator.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">⏱️</div><div class="feat-text"><h4>Freeze Interval</h4><p>Automatically freezes and analyzes a frame every N seconds while the camera is running. Great for hands-free scanning!</p></div></div>
-      <div class="feat-item"><div class="feat-icon">🎯</div><div class="feat-text"><h4>Min Duplicates Threshold</h4><p>Only fire confetti and count a match if at least this many duplicate symbols are found. Reduces false positives from partial card views.</p></div></div>
+    <div class="modal-panel active" id="mt-live">
+      <div class="feat-item"><div class="feat-icon">📷</div><div class="feat-text"><h4>Start / Stop Camera</h4><p>Opens your device's rear camera and runs real-time symbol detection on every frame. Bounding boxes update live — green for duplicate symbols, red for unique ones.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">📸</div><div class="feat-text"><h4>Freeze & Analyze</h4><p>Tap to trigger a countdown (if enabled), then captures the exact frame, stops the camera, and runs a full analysis — counting all symbols, highlighting duplicates, updating your session stats, saving to history, and firing confetti on a match!</p></div></div>
+      <div class="feat-item"><div class="feat-icon">⏳</div><div class="feat-text"><h4>Countdown Freeze</h4><p>When ON, pressing Freeze starts a 3-2-1 countdown on screen before capturing. Gives you time to hold the card perfectly steady before the shot is taken.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">🃏</div><div class="feat-text"><h4>Min Symbols Gate</h4><p>Set a minimum number of symbols that must be visible before a Freeze can run. Prevents analyzing a partial card view — only triggers when the whole card is in frame.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">📊</div><div class="feat-text"><h4>Live Stats Bar</h4><p>Shows in real time how many symbols and duplicates the AI currently sees on screen, plus a frame counter. Helps you know when the card is fully visible.</p></div></div>
     </div>
-
-    <div class="modal-panel" id="mtab-photo">
-      <div class="feat-item"><div class="feat-icon">🖼️</div><div class="feat-text"><h4>Upload Card</h4><p>Upload any photo of a Spot It! card from your gallery. Instantly detects all symbols and highlights duplicates.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">📜</div><div class="feat-text"><h4>Card History</h4><p>Thumbnails of your last 8 scanned cards (uploads + frozen camera frames). Green badge = number of duplicates found, red badge = no match.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">🔄</div><div class="feat-text"><h4>Reset</h4><p>Clears the current image, resets all session stats, and empties the history panel.</p></div></div>
+    <div class="modal-panel" id="mt-photo">
+      <div class="feat-item"><div class="feat-icon">🖼️</div><div class="feat-text"><h4>Upload Card</h4><p>Upload any photo from your gallery. The AI instantly detects all symbols, draws boxes, highlights duplicates, and shows results below.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">📜</div><div class="feat-text"><h4>Card History</h4><p>Thumbnails of your last 8 scanned cards. Green badge = number of duplicates found. Red badge = no match. Toggle history off to keep things clean.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">🔄</div><div class="feat-text"><h4>Reset</h4><p>Clears the current image, resets all session stats to zero, and empties the history panel.</p></div></div>
     </div>
-
-    <div class="modal-panel" id="mtab-shared">
-      <div class="feat-item"><div class="feat-icon">🎯</div><div class="feat-text"><h4>Confidence Slider</h4><p>How certain the AI must be before drawing a box. Lower = more detections, possibly noisier. Higher = fewer but more accurate. Default 30%.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">✨</div><div class="feat-text"><h4>Glow Boxes</h4><p>Adds a neon glow around bounding boxes. Green glow for duplicate symbols, red for unique ones.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">🏷️</div><div class="feat-text"><h4>Labels</h4><p>Shows the symbol name on each bounding box. Turn off to see only the coloured boxes.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">🔢</div><div class="feat-text"><h4>Confidence %</h4><p>Shows or hides the confidence number inside labels (e.g. "dolphin 87%"). Turn off for just the name.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">🌙</div><div class="feat-text"><h4>Dark Mode</h4><p>Switches to a dark theme for comfortable use in low light.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">🔊</div><div class="feat-text"><h4>Sound</h4><p>Scan beep on detection, victory chime on match. Toggle to mute.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">📤</div><div class="feat-text"><h4>Share</h4><p>Share this app's link or copy it to clipboard.</p></div></div>
+    <div class="modal-panel" id="mt-shared">
+      <div class="feat-item"><div class="feat-icon">🎯</div><div class="feat-text"><h4>Confidence Slider</h4><p>How certain the AI must be before drawing a box. Lower = more detections (noisier). Higher = fewer but more accurate detections. Default is 30%.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">✨</div><div class="feat-text"><h4>Glow Boxes</h4><p>Adds a coloured neon glow around detection boxes. Green glow for duplicates, red for unique symbols. Turn off for a cleaner look.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">🏷️</div><div class="feat-text"><h4>Labels</h4><p>Shows the symbol name on each bounding box. Toggle off to show boxes only.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">🔢</div><div class="feat-text"><h4>Confidence %</h4><p>Shows or hides the confidence score inside labels (e.g. "dolphin 87%"). Turn off for just the symbol name.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">🌙</div><div class="feat-text"><h4>Dark Mode</h4><p>Switches the entire app to a dark theme for comfortable use in low-light conditions.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">🔊</div><div class="feat-text"><h4>Sound</h4><p>A beep plays on scan and a chime plays when a match is found. Toggle off to silence all sounds.</p></div></div>
     </div>
   </div>
 </div>
 
 <div class="rainbow-bar"></div>
+
 <div class="shell">
 
   <!-- TOPBAR -->
@@ -260,15 +249,15 @@ body.dark .ph-circle{background:linear-gradient(135deg,#2a2040,#1e2a40);border-c
       <div class="logo-icon">🔍</div>
       <div class="logo-text">
         <h1>Spot It! AI Solver</h1>
-        <p>⚡ YOLOv8m · 57 Symbols</p>
+        <p>⚡ YOLOv8m · 57 Symbols · Real-time Detection</p>
       </div>
     </div>
     <div class="topbar-actions">
-      <button class="icon-btn" id="help-btn" title="Guide">❓</button>
-      <button class="icon-btn" id="dark-toggle" title="Dark mode">🌙</button>
-      <button class="icon-btn" id="sound-toggle" title="Sound">🔊</button>
+      <button class="icon-btn" id="help-btn" title="Features guide">❓</button>
+      <button class="icon-btn" id="dark-btn" title="Dark mode">🌙</button>
+      <button class="icon-btn" id="sound-btn" title="Sound">🔊</button>
       <button class="icon-btn" id="share-btn" title="Share">📤</button>
-      <button class="icon-btn" id="stats-btn" title="Stats">📊</button>
+      <button class="icon-btn" id="stats-btn" title="Session stats">📊</button>
     </div>
   </div>
 
@@ -276,7 +265,7 @@ body.dark .ph-circle{background:linear-gradient(135deg,#2a2040,#1e2a40);border-c
   <div class="session-strip">
     <div class="sc"><div class="sc-val" id="sc-scans">0</div><div class="sc-lbl">🃏 Scanned</div></div>
     <div class="sc"><div class="sc-val" id="sc-matches">0</div><div class="sc-lbl">🎯 Matches</div></div>
-    <div class="sc"><div class="sc-val" id="sc-symbols">0</div><div class="sc-lbl">✨ Symbols</div></div>
+    <div class="sc"><div class="sc-val" id="sc-symbols">0</div><div class="sc-lbl">✨ Total Symbols</div></div>
   </div>
 
   <!-- STATUS -->
@@ -293,98 +282,102 @@ body.dark .ph-circle{background:linear-gradient(135deg,#2a2040,#1e2a40);border-c
     <button class="mode-tab" data-tab="photo">🖼️ Photo Mode</button>
   </div>
 
-  <!-- ══════════════════════════════
-       LIVE MODE PANEL
-  ══════════════════════════════ -->
+  <!-- ══ LIVE MODE ══ -->
   <div class="panel active" id="panel-live">
 
-    <!-- Live Controls -->
     <div class="btns">
       <button class="btn btn-cam" id="cam-btn">📷 Start Camera</button>
       <button class="btn btn-freeze" id="freeze-btn">📸 Freeze &amp; Analyze</button>
     </div>
 
     <!-- Live Settings -->
-    <div class="settings-bar">
-      <div class="si"><label>🎯 Conf:</label><input type="range" id="live-conf" min="10" max="90" value="30"/><span class="cv" id="live-cv">30%</span></div>
-      <div class="si"><label>✨ Glow:</label><button class="tog on" id="live-glow"></button></div>
-      <div class="si"><label>🏷️ Labels:</label><button class="tog on" id="live-labels"></button></div>
-      <div class="si"><label>🔢 Conf%:</label><button class="tog on" id="live-confpct"></button></div>
+    <div class="settings-card">
+      <h3>🎛️ Detection Settings</h3>
+      <div class="settings-row">
+        <div class="si"><label>🎯 Confidence:</label><input type="range" id="live-conf" min="10" max="90" value="30"/><span class="cv" id="live-cv">30%</span></div>
+        <div class="si"><label>✨ Glow:</label><button class="tog on" id="live-glow"></button></div>
+        <div class="si"><label>🏷️ Labels:</label><button class="tog on" id="live-labels"></button></div>
+        <div class="si"><label>🔢 Conf %:</label><button class="tog on" id="live-confpct"></button></div>
+      </div>
     </div>
 
-    <!-- Live-only Settings -->
-    <div class="settings-bar">
-      <div class="si"><label>🤖 Auto-Freeze:</label><button class="tog" id="auto-freeze-tog"></button></div>
-      <div class="si"><label>🎯 Min Dups:</label>
-        <input type="range" id="min-dups-slider" min="1" max="5" value="1" style="width:70px"/>
-        <span class="cv" id="min-dups-val">1</span>
-      </div>
-      <div class="si"><label>⏱️ Interval (s):</label>
-        <input type="range" id="interval-slider" min="0" max="10" value="0" style="width:70px"/>
-        <span class="cv" id="interval-val">Off</span>
+    <div class="settings-card">
+      <h3>📹 Camera Settings</h3>
+      <div class="settings-row">
+        <div class="si"><label>⏳ Countdown Freeze:</label><button class="tog on" id="countdown-tog"></button></div>
+        <div class="si">
+          <label>🃏 Min Symbols:</label>
+          <input type="range" id="min-sym-slider" min="1" max="12" value="4" style="width:80px"/>
+          <span class="cv" id="min-sym-val">4</span>
+        </div>
+        <div class="si"><label>📜 History:</label><button class="tog on" id="live-hist-tog"></button></div>
       </div>
     </div>
 
     <!-- Live Stats Bar -->
     <div class="live-bar" id="live-bar">
-      <div class="live-dot" id="live-dot"></div>
-      <div class="live-stat">Symbols: <span id="ls-sym">0</span></div>
-      <div class="live-stat">Duplicates: <span id="ls-dup">0</span></div>
-      <div class="live-stat">Frames: <span id="ls-frames">0</span></div>
+      <div class="rec-dot" id="rec-dot"></div>
+      <div class="live-pill">Symbols on screen: <span id="ls-sym">0</span></div>
+      <div class="live-pill">Duplicates: <span id="ls-dup">0</span></div>
+      <div class="live-pill">Frames: <span id="ls-frames">0</span></div>
     </div>
 
-    <!-- Alert Banner -->
+    <!-- Alert -->
     <div class="alert-banner" id="alert-banner"></div>
 
-    <!-- Media Card (Live) -->
+    <!-- Media Card -->
     <div class="media-card" id="live-media">
-      <div class="scanning-line"></div>
+      <div class="scan-line"></div>
+      <div class="countdown-overlay" id="countdown-overlay">
+        <div class="countdown-num" id="countdown-num">3</div>
+      </div>
       <div class="ph" id="live-ph">
         <div class="ph-circle">📹</div>
         <h3>Live Mode</h3>
         <p>Start the camera to detect symbols in real time!</p>
       </div>
       <video id="video" autoplay playsinline muted></video>
+      <img class="freeze-img" id="freeze-img" alt="frozen frame"/>
       <canvas id="live-canvas"></canvas>
     </div>
 
     <!-- Live History -->
-    <div class="history-section" id="live-hist-section">
+    <div class="hist-section" id="live-hist-sec">
       <div class="hist-title">📜 Frozen Frames</div>
-      <div class="history-list" id="live-hist-list"></div>
+      <div class="hist-list" id="live-hist-list"></div>
     </div>
 
     <!-- Live Results -->
-    <div id="results" class="r-result">
-      <div class="r-head" id="r-head"><div class="r-hi" id="r-icon"></div><div><div class="r-ht" id="r-title"></div><div class="r-hs" id="r-sub"></div></div></div>
-      <div class="r-body"><div class="r-meta"><span>🎯 Symbols:</span><span class="chip chip-o" id="r-count">0</span><span>🟢 Dups:</span><span class="chip chip-g" id="r-dups">0</span></div><ul class="dup-grid" id="r-grid"></ul><div class="no-dup" id="r-nodup"></div></div>
+    <div class="r-panel" id="live-results">
+      <div class="r-head" id="lr-head"><div class="r-icon" id="lr-icon"></div><div><div class="r-title" id="lr-title"></div><div class="r-sub" id="lr-sub"></div></div></div>
+      <div class="r-body"><div class="r-meta"><span>🎯 Symbols:</span><span class="chip chip-o" id="lr-count">0</span><span>🟢 Duplicates:</span><span class="chip chip-g" id="lr-dups">0</span></div><ul class="dup-grid" id="lr-grid"></ul><div class="no-dup" id="lr-nodup"></div></div>
     </div>
 
-  </div><!-- /panel-live -->
+  </div><!-- /live -->
 
-  <!-- ══════════════════════════════
-       PHOTO MODE PANEL
-  ══════════════════════════════ -->
+  <!-- ══ PHOTO MODE ══ -->
   <div class="panel" id="panel-photo">
 
-    <!-- Photo Controls -->
     <div class="btns">
       <label class="btn btn-upload">🖼️ Upload Card<input type="file" id="upload-input" accept="image/*"/></label>
       <button class="btn btn-reset" id="reset-btn">🔄 Reset</button>
     </div>
 
     <!-- Photo Settings -->
-    <div class="settings-bar">
-      <div class="si"><label>🎯 Conf:</label><input type="range" id="photo-conf" min="10" max="90" value="30"/><span class="cv" id="photo-cv">30%</span></div>
-      <div class="si"><label>✨ Glow:</label><button class="tog on" id="photo-glow"></button></div>
-      <div class="si"><label>🏷️ Labels:</label><button class="tog on" id="photo-labels"></button></div>
-      <div class="si"><label>🔢 Conf%:</label><button class="tog on" id="photo-confpct"></button></div>
-      <div class="si"><label>📜 History:</label><button class="tog on" id="photo-hist-tog"></button></div>
+    <div class="settings-card">
+      <h3>🎛️ Detection Settings</h3>
+      <div class="settings-row">
+        <div class="si"><label>🎯 Confidence:</label><input type="range" id="photo-conf" min="10" max="90" value="30"/><span class="cv" id="photo-cv">30%</span></div>
+        <div class="si"><label>✨ Glow:</label><button class="tog on" id="photo-glow"></button></div>
+        <div class="si"><label>🏷️ Labels:</label><button class="tog on" id="photo-labels"></button></div>
+        <div class="si"><label>🔢 Conf %:</label><button class="tog on" id="photo-confpct"></button></div>
+        <div class="si"><label>📜 History:</label><button class="tog on" id="photo-hist-tog"></button></div>
+      </div>
     </div>
 
-    <!-- Media Card (Photo) -->
+    <!-- Media Card -->
     <div class="media-card" id="photo-media">
-      <div class="scanning-line"></div>
+      <div class="scan-line"></div>
       <div class="ph" id="photo-ph">
         <div class="ph-circle">🃏</div>
         <h3>No card yet!</h3>
@@ -395,59 +388,52 @@ body.dark .ph-circle{background:linear-gradient(135deg,#2a2040,#1e2a40);border-c
     </div>
 
     <!-- Photo History -->
-    <div class="history-section" id="photo-hist-section">
+    <div class="hist-section" id="photo-hist-sec">
       <div class="hist-title">📜 Recent Cards</div>
-      <div class="history-list" id="photo-hist-list"></div>
+      <div class="hist-list" id="photo-hist-list"></div>
     </div>
 
     <!-- Photo Results -->
-    <div id="results2" class="r-result">
-      <div class="r-head" id="r2-head"><div class="r-hi" id="r2-icon"></div><div><div class="r-ht" id="r2-title"></div><div class="r-hs" id="r2-sub"></div></div></div>
-      <div class="r-body"><div class="r-meta"><span>🎯 Symbols:</span><span class="chip chip-o" id="r2-count">0</span><span>🟢 Dups:</span><span class="chip chip-g" id="r2-dups">0</span></div><ul class="dup-grid" id="r2-grid"></ul><div class="no-dup" id="r2-nodup"></div></div>
+    <div class="r-panel" id="photo-results">
+      <div class="r-head" id="pr-head"><div class="r-icon" id="pr-icon"></div><div><div class="r-title" id="pr-title"></div><div class="r-sub" id="pr-sub"></div></div></div>
+      <div class="r-body"><div class="r-meta"><span>🎯 Symbols:</span><span class="chip chip-o" id="pr-count">0</span><span>🟢 Duplicates:</span><span class="chip chip-g" id="pr-dups">0</span></div><ul class="dup-grid" id="pr-grid"></ul><div class="no-dup" id="pr-nodup"></div></div>
     </div>
 
-  </div><!-- /panel-photo -->
+  </div><!-- /photo -->
 
 </div><!-- .shell -->
 
 <script>
-// ─────────────────────────────────────────
-// CLASSES + EMOJIS
-// ─────────────────────────────────────────
+// ── DATA ──
 const classNames=["anchor","apple","baby_bottle","bird","bomb","cactus","candle","carrot","cat","cheese","clock","clown","dinosaur","dog","dolphin","dragon","exclamation_point","eye","fire","flower","four_leaf_clover","ghost","green_splat","hammer","hand","heart","ice_cube","igloo","key","knight","ladybug","leaf","light_bulb","lightning","lips","lock","moon","orange_man","pencil","question_mark","scissors","skull","snowflake","snowman","spider","spider_web","stop_sign","sun","sunglasses","target","taxi","tortoise","treble_clef","tree","water_drop","yin_yang","zebra"];
 const emojiMap={anchor:"⚓",apple:"🍎",baby_bottle:"🍼",bird:"🐦",bomb:"💣",cactus:"🌵",candle:"🕯️",carrot:"🥕",cat:"🐱",cheese:"🧀",clock:"🕐",clown:"🤡",dinosaur:"🦕",dog:"🐶",dolphin:"🐬",dragon:"🐉",exclamation_point:"❗",eye:"👁️",fire:"🔥",flower:"🌸",four_leaf_clover:"🍀",ghost:"👻",green_splat:"💚",hammer:"🔨",hand:"✋",heart:"❤️",ice_cube:"🧊",igloo:"🏠",key:"🔑",knight:"♞",ladybug:"🐞",leaf:"🍃",light_bulb:"💡",lightning:"⚡",lips:"👄",lock:"🔒",moon:"🌙",orange_man:"🧡",pencil:"✏️",question_mark:"❓",scissors:"✂️",skull:"💀",snowflake:"❄️",snowman:"⛄",spider:"🕷️",spider_web:"🕸️",stop_sign:"🛑",sun:"☀️",sunglasses:"🕶️",target:"🎯",taxi:"🚕",tortoise:"🐢",treble_clef:"🎵",tree:"🌲",water_drop:"💧",yin_yang:"☯️",zebra:"🦓"};
 const MODEL_PATH='./yolov8_tfjs/model.json';
 
-// ─────────────────────────────────────────
-// STATE
-// ─────────────────────────────────────────
-let model, isRunning=false, soundOn=true;
-let liveConf=.30, photoConf=.30;
-let liveGlow=true, liveLabels=true, liveConfPct=true;
-let photoGlow=true, photoLabels=true, photoConfPct=true, photoHistOn=true;
-let autoFreeze=false, minDups=1, intervalSecs=0;
-let intervalTimer=null, frameCount=0;
-let liveHistory=[], photoHistory=[];
+// ── STATE ──
+let model,isRunning=false,soundOn=true,countdownOn=true,minSyms=4;
+let liveConf=.30,photoConf=.30;
+let liveGlow=true,liveLabels=true,liveConfPct=true,liveHistOn=true;
+let photoGlow=true,photoLabels=true,photoConfPct=true,photoHistOn=true;
+let liveHistory=[],photoHistory=[];
 let stats={scans:0,matches:0,totalSymbols:0};
-let liveCurrentSyms=0, liveCurrentDups=0;
+let frameCount=0,liveSyms=0,liveDups=0;
+let freezeInProgress=false;
 
 const video=document.getElementById('video');
 const imgEl=document.getElementById('img-el');
+const freezeImg=document.getElementById('freeze-img');
 const liveCanvas=document.getElementById('live-canvas');
 const photoCanvas=document.getElementById('photo-canvas');
-const liveCtx=liveCanvas.getContext('2d');
-const photoCtx=photoCanvas.getContext('2d');
+const lc=liveCanvas.getContext('2d');
+const pc=photoCanvas.getContext('2d');
 
-// ─────────────────────────────────────────
-// UTILITIES
-// ─────────────────────────────────────────
+// ── HELPERS ──
 function setStatus(msg,state){
   document.getElementById('status-txt').textContent=msg;
   document.getElementById('status-pill').className='status-pill'+(state?' '+state:'');
 }
-function showToast(msg,dur=2500){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
+function showToast(msg,dur=2600){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
   clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),dur);
 }
 function updateStats(){
@@ -455,15 +441,10 @@ function updateStats(){
   document.getElementById('sc-matches').textContent=stats.matches;
   document.getElementById('sc-symbols').textContent=stats.totalSymbols;
 }
-function updateLiveBar(){
-  document.getElementById('ls-sym').textContent=liveCurrentSyms;
-  document.getElementById('ls-dup').textContent=liveCurrentDups;
-  document.getElementById('ls-frames').textContent=frameCount;
-}
 function showAlert(msg,type='ok'){
   const b=document.getElementById('alert-banner');
   b.textContent=msg;b.className='alert-banner visible'+(type==='fail'?' fail':'');
-  clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove('visible'),3500);
+  clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove('visible'),4000);
 }
 function playSound(type){
   if(!soundOn)return;
@@ -471,148 +452,46 @@ function playSound(type){
     const ac=new AudioContext(),o=ac.createOscillator(),g=ac.createGain();
     o.connect(g);g.connect(ac.destination);
     if(type==='match'){
-      o.type='sine';
-      [523,659,784].forEach((f,i)=>o.frequency.setValueAtTime(f,ac.currentTime+i*.12));
-      g.gain.setValueAtTime(.28,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.6);
-      o.start();o.stop(ac.currentTime+.6);
+      o.type='sine';[523,659,784].forEach((f,i)=>o.frequency.setValueAtTime(f,ac.currentTime+i*.13));
+      g.gain.setValueAtTime(.28,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.65);
+      o.start();o.stop(ac.currentTime+.65);
+    }else if(type==='countdown'){
+      o.type='sine';o.frequency.value=660;
+      g.gain.setValueAtTime(.2,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.18);
+      o.start();o.stop(ac.currentTime+.18);
     }else{
       o.type='sine';o.frequency.value=880;
-      g.gain.setValueAtTime(.14,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.15);
-      o.start();o.stop(ac.currentTime+.15);
+      g.gain.setValueAtTime(.13,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.14);
+      o.start();o.stop(ac.currentTime+.14);
     }
   }catch(e){}
 }
 function launchConfetti(){
-  const c=document.getElementById('confetti-container');
+  const c=document.getElementById('confetti');
   ['#ff4757','#ffd32a','#2ed573','#1e90ff','#a55eea','#ff6b9d','#ff8c00'].forEach(col=>{
     for(let i=0;i<11;i++){
-      const p=document.createElement('div');p.className='confetti-piece';
+      const p=document.createElement('div');p.className='cp';
       p.style.cssText=`left:${Math.random()*100}%;background:${col};width:${6+Math.random()*9}px;height:${6+Math.random()*9}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${1.4+Math.random()*2}s;animation-delay:${Math.random()*.5}s`;
       c.appendChild(p);setTimeout(()=>p.remove(),(3+Math.random()*2)*1000);
     }
   });
 }
 
-// ─────────────────────────────────────────
-// MODEL
-// ─────────────────────────────────────────
+// ── MODEL ──
 async function loadModel(){
   try{
     model=await tf.loadGraphModel(MODEL_PATH);
-    setStatus('Ready to play! 🎉','ready');
-    showToast('🤖 AI Model loaded!');
+    setStatus('Ready to play! 🎉','ready');showToast('🤖 AI Model loaded!');
   }catch(e){
-    setStatus('Model not found 😢','error');
-    showToast('❌ Error loading model.',4000);
-    console.error(e);
+    setStatus('Model not found 😢','error');showToast('❌ Error loading model.',4000);console.error(e);
   }
 }
 
-// ─────────────────────────────────────────
-// DRAW BOXES
-// ─────────────────────────────────────────
-function drawBoxes(ctx, sel, boxes, scores, cls, canvasW, canvasH, glowOn, labelsOn, confPctOn){
-  const mW=640,mH=640;
-  const finalCls=Array.from(sel).map(i=>classNames[cls[i]]||'Unknown');
-  const counts={};finalCls.forEach(c=>{counts[c]=(counts[c]||0)+1});
-  for(let i=0;i<sel.length;i++){
-    const idx=sel[i],b=boxes[idx],sc=(scores[idx]*100).toFixed(0);
-    const name=classNames[cls[idx]]||'Unknown',isDup=counts[name]>1;
-    const ymin=(b[0]/mH)*canvasH,xmin=(b[1]/mW)*canvasW;
-    const ymax=(b[2]/mH)*canvasH,xmax=(b[3]/mW)*canvasW;
-    const col=isDup?'#2ed573':'#ff4757';
-    if(glowOn){ctx.shadowColor=col;ctx.shadowBlur=isDup?16:8}
-    const r=5;ctx.strokeStyle=col;ctx.lineWidth=isDup?3.5:2;
-    ctx.beginPath();
-    ctx.moveTo(xmin+r,ymin);ctx.lineTo(xmax-r,ymin);ctx.quadraticCurveTo(xmax,ymin,xmax,ymin+r);
-    ctx.lineTo(xmax,ymax-r);ctx.quadraticCurveTo(xmax,ymax,xmax-r,ymax);
-    ctx.lineTo(xmin+r,ymax);ctx.quadraticCurveTo(xmin,ymax,xmin,ymax-r);
-    ctx.lineTo(xmin,ymin+r);ctx.quadraticCurveTo(xmin,ymin,xmin+r,ymin);
-    ctx.closePath();ctx.stroke();ctx.shadowBlur=0;
-    if(labelsOn){
-      const dn=name.replace(/_/g,' ');
-      const label=confPctOn?`${dn} ${sc}%`:dn;
-      const ly=ymin>28?ymin-25:ymin+2;
-      ctx.font='bold 12px Nunito,Arial';
-      ctx.fillStyle=col;ctx.fillRect(xmin,ly,ctx.measureText(label).width+14,20);
-      ctx.fillStyle=isDup?'#06060f':'#fff';ctx.fillText(label,xmin+7,ly+14);
-    }
-  }
-  return {finalCls,counts};
-}
-
-// ─────────────────────────────────────────
-// SHOW RESULTS
-// ─────────────────────────────────────────
-function showResults(detected,imgSrc,mode){
-  const counts={};detected.forEach(c=>{counts[c]=(counts[c]||0)+1});
-  const dups=Object.entries(counts).filter(([,n])=>n>1);
-  stats.scans++;stats.totalSymbols+=detected.length;
-  if(dups.length>=minDups)stats.matches++;
-  updateStats();
-  // History
-  const histArr=mode==='live'?liveHistory:photoHistory;
-  if(imgSrc){
-    histArr.unshift({src:imgSrc,count:detected.length,dups:dups.length});
-    if(histArr.length>8)histArr.pop();
-    renderHistory(mode);
-  }
-  const prefix=mode==='live'?'r':'r2';
-  const panel=document.getElementById(mode==='live'?'results':'results2');
-  panel.style.display='block';
-  panel.className='r-result '+(dups.length>=minDups?'ok-result':'fail-result');
-  document.getElementById(prefix+'-count').textContent=detected.length;
-  document.getElementById(prefix+'-dups').textContent=dups.length;
-  document.getElementById(prefix+'-grid').innerHTML='';
-  document.getElementById(prefix+'-nodup').textContent='';
-  const head=document.getElementById(prefix+'-head');
-  if(dups.length>=minDups){
-    head.className='r-head ok';
-    document.getElementById(prefix+'-icon').textContent='🎉';
-    document.getElementById(prefix+'-title').textContent='Match Found!';
-    document.getElementById(prefix+'-sub').textContent=`${dups.length} duplicate symbol${dups.length>1?'s':''} found!`;
-    dups.forEach(([name,n],i)=>{
-      const li=document.createElement('li');li.className='dup-item';li.style.animationDelay=`${i*.06}s`;
-      li.innerHTML=`<span class="dup-emoji">${emojiMap[name]||'🔹'}</span><span class="dup-name">${name.replace(/_/g,' ')}</span><span class="dup-x">×${n}</span>`;
-      document.getElementById(prefix+'-grid').appendChild(li);
-    });
-    launchConfetti();playSound('match');
-    if(mode==='live')showAlert(`🎉 Match! ${dups.length} duplicate${dups.length>1?'s':''} found!`,'ok');
-    else showToast(`🎉 Found ${dups.length} duplicate${dups.length>1?'s':''}!`);
-  }else{
-    head.className='r-head fail';
-    document.getElementById(prefix+'-icon').textContent='🤔';
-    document.getElementById(prefix+'-title').textContent='No Duplicates!';
-    document.getElementById(prefix+'-sub').textContent='Every symbol appears just once.';
-    document.getElementById(prefix+'-nodup').textContent='❌ No duplicate symbols found.';
-    if(mode==='live')showAlert('🤔 No duplicates this time.','fail');
-    else showToast('🤔 No duplicates this time!');
-  }
-}
-
-function renderHistory(mode){
-  const arr=mode==='live'?liveHistory:photoHistory;
-  const sec=document.getElementById(mode==='live'?'live-hist-section':'photo-hist-section');
-  const list=document.getElementById(mode==='live'?'live-hist-list':'photo-hist-list');
-  const histOn=mode==='photo'?photoHistOn:true;
-  if(!histOn||arr.length===0){sec.style.display='none';return}
-  sec.style.display='block';list.innerHTML='';
-  arr.forEach(h=>{
-    const d=document.createElement('div');d.className='hi';
-    d.innerHTML=`<img src="${h.src}"/><div class="hbadge ${h.dups?'':'none'}">${h.dups||'!'}</div>`;
-    d.title=`${h.count} symbols, ${h.dups} dups`;
-    list.appendChild(d);
-  });
-}
-
-// ─────────────────────────────────────────
-// INFERENCE
-// ─────────────────────────────────────────
-async function runInference(src, conf){
-  const[mW,mH]=[640,640];
+// ── INFERENCE ──
+async function runInference(src,conf){
   tf.engine().startScope();
   const inp=tf.browser.fromPixels(src);
-  const resized=tf.image.resizeBilinear(inp,[mW,mH]).div(255).expandDims(0);
+  const resized=tf.image.resizeBilinear(inp,[640,640]).div(255).expandDims(0);
   const pred=await model.executeAsync(resized);
   const raw=pred.transpose([0,2,1]).squeeze().arraySync();
   const boxes=[],scores=[],cls=[];
@@ -621,113 +500,203 @@ async function runInference(src, conf){
     if(ms>conf){const[cx,cy,w,h]=row;boxes.push([cy-h/2,cx-w/2,cy+h/2,cx+w/2]);scores.push(ms);cls.push(ci)}
   }
   let sel=new Int32Array();
-  if(boxes.length){
-    const nms=await tf.image.nonMaxSuppressionAsync(boxes,scores,20,.45,.25);
-    sel=nms.dataSync();
-  }
+  if(boxes.length){const nms=await tf.image.nonMaxSuppressionAsync(boxes,scores,20,.45,.25);sel=nms.dataSync()}
   tf.engine().endScope();
   return{boxes,scores,cls,sel};
 }
 
-// ─────────────────────────────────────────
-// LIVE LOOP
-// ─────────────────────────────────────────
+// ── DRAW ──
+function drawBoxes(ctx,sel,boxes,scores,cls,W,H,glow,labels,confPct){
+  const counts={};
+  const finalCls=Array.from(sel).map(i=>classNames[cls[i]]||'Unknown');
+  finalCls.forEach(c=>{counts[c]=(counts[c]||0)+1});
+  for(let i=0;i<sel.length;i++){
+    const idx=sel[i],b=boxes[idx],sc=(scores[idx]*100).toFixed(0);
+    const name=classNames[cls[idx]]||'Unknown',isDup=counts[name]>1;
+    const yn=(b[0]/640)*H,xn=(b[1]/640)*W,yx=(b[2]/640)*H,xx=(b[3]/640)*W;
+    const col=isDup?'#2ed573':'#ff4757';
+    if(glow){ctx.shadowColor=col;ctx.shadowBlur=isDup?16:8}
+    const r=5;ctx.strokeStyle=col;ctx.lineWidth=isDup?3.5:2;
+    ctx.beginPath();
+    ctx.moveTo(xn+r,yn);ctx.lineTo(xx-r,yn);ctx.quadraticCurveTo(xx,yn,xx,yn+r);
+    ctx.lineTo(xx,yx-r);ctx.quadraticCurveTo(xx,yx,xx-r,yx);
+    ctx.lineTo(xn+r,yx);ctx.quadraticCurveTo(xn,yx,xn,yx-r);
+    ctx.lineTo(xn,yn+r);ctx.quadraticCurveTo(xn,yn,xn+r,yn);
+    ctx.closePath();ctx.stroke();ctx.shadowBlur=0;
+    if(labels){
+      const dn=name.replace(/_/g,' '),lbl=confPct?`${dn} ${sc}%`:dn;
+      const ly=yn>26?yn-24:yn+2;
+      ctx.font='bold 12px Nunito,Arial';
+      ctx.fillStyle=col;ctx.fillRect(xn,ly,ctx.measureText(lbl).width+14,20);
+      ctx.fillStyle=isDup?'#06060f':'#fff';ctx.fillText(lbl,xn+7,ly+14);
+    }
+  }
+  return{finalCls,counts};
+}
+
+// ── SHOW RESULTS ──
+function showResults(detected,imgSrc,mode){
+  const counts={};detected.forEach(c=>{counts[c]=(counts[c]||0)+1});
+  const dups=Object.entries(counts).filter(([,n])=>n>1);
+  stats.scans++;stats.totalSymbols+=detected.length;
+  if(dups.length>0)stats.matches++;
+  updateStats();
+  const histArr=mode==='live'?liveHistory:photoHistory;
+  if(imgSrc){histArr.unshift({src:imgSrc,count:detected.length,dups:dups.length});if(histArr.length>8)histArr.pop();renderHistory(mode)}
+  const p=mode==='live'?'lr':'pr';
+  const panel=document.getElementById(mode==='live'?'live-results':'photo-results');
+  panel.style.display='block';panel.className='r-panel '+(dups.length?'ok':'fail');
+  document.getElementById(p+'-count').textContent=detected.length;
+  document.getElementById(p+'-dups').textContent=dups.length;
+  document.getElementById(p+'-grid').innerHTML='';
+  document.getElementById(p+'-nodup').textContent='';
+  const head=document.getElementById(p+'-head');
+  if(dups.length){
+    head.className='r-head ok';
+    document.getElementById(p+'-icon').textContent='🎉';
+    document.getElementById(p+'-title').textContent='Match Found!';
+    document.getElementById(p+'-sub').textContent=`${dups.length} duplicate symbol${dups.length>1?'s':''} on this card!`;
+    dups.forEach(([name,n],i)=>{
+      const li=document.createElement('li');li.className='dup-item';li.style.animationDelay=`${i*.065}s`;
+      li.innerHTML=`<span class="dup-emoji">${emojiMap[name]||'🔹'}</span><span class="dup-name">${name.replace(/_/g,' ')}</span><span class="dup-x">×${n}</span>`;
+      document.getElementById(p+'-grid').appendChild(li);
+    });
+    launchConfetti();playSound('match');
+    if(mode==='live')showAlert(`🎉 Match! ${dups.length} duplicate${dups.length>1?'s':''} found!`,'ok');
+    else showToast(`🎉 Found ${dups.length} duplicate${dups.length>1?'s':''}!`);
+  }else{
+    head.className='r-head fail';
+    document.getElementById(p+'-icon').textContent='🤔';
+    document.getElementById(p+'-title').textContent='No Duplicates!';
+    document.getElementById(p+'-sub').textContent='Every symbol appears just once.';
+    document.getElementById(p+'-nodup').textContent='❌ No duplicate symbols found.';
+    if(mode==='live')showAlert('🤔 No duplicates this time.','fail');
+    else showToast('🤔 No duplicates this time!');
+  }
+}
+
+function renderHistory(mode){
+  const arr=mode==='live'?liveHistory:photoHistory;
+  const on=mode==='live'?liveHistOn:photoHistOn;
+  const sec=document.getElementById(mode==='live'?'live-hist-sec':'photo-hist-sec');
+  const list=document.getElementById(mode==='live'?'live-hist-list':'photo-hist-list');
+  if(!on||arr.length===0){sec.style.display='none';return}
+  sec.style.display='block';list.innerHTML='';
+  arr.forEach(h=>{
+    const d=document.createElement('div');d.className='hi';
+    d.innerHTML=`<img src="${h.src}"/><div class="hbadge ${h.dups?'':'none'}">${h.dups||'!'}</div>`;
+    d.title=`${h.count} symbols · ${h.dups} dups`;list.appendChild(d);
+  });
+}
+
+// ── LIVE LOOP ──
 async function liveLoop(){
   if(!model||!isRunning)return;
-  const mc=document.getElementById('live-media');
   liveCanvas.width=video.clientWidth||640;liveCanvas.height=video.clientHeight||480;
-  mc.classList.add('scanning');
+  document.getElementById('live-media').classList.add('scanning');
   const{boxes,scores,cls,sel}=await runInference(video,liveConf);
-  liveCtx.clearRect(0,0,liveCanvas.width,liveCanvas.height);
+  lc.clearRect(0,0,liveCanvas.width,liveCanvas.height);
   if(sel.length){
-    const{finalCls,counts}=drawBoxes(liveCtx,sel,boxes,scores,cls,liveCanvas.width,liveCanvas.height,liveGlow,liveLabels,liveConfPct);
-    const dups=Object.values(counts).filter(n=>n>1).length;
-    liveCurrentSyms=finalCls.length;liveCurrentDups=dups;
-    // Auto-freeze on match
-    if(autoFreeze&&dups>=minDups){
-      triggerFreeze();return;
-    }
-  }else{liveCurrentSyms=0;liveCurrentDups=0}
-  frameCount++;updateLiveBar();
-  mc.classList.remove('scanning');
+    const{finalCls,counts}=drawBoxes(lc,sel,boxes,scores,cls,liveCanvas.width,liveCanvas.height,liveGlow,liveLabels,liveConfPct);
+    liveSyms=finalCls.length;liveDups=Object.values(counts).filter(n=>n>1).length;
+  }else{liveSyms=0;liveDups=0}
+  frameCount++;
+  document.getElementById('ls-sym').textContent=liveSyms;
+  document.getElementById('ls-dup').textContent=liveDups;
+  document.getElementById('ls-frames').textContent=frameCount;
+  document.getElementById('live-media').classList.remove('scanning');
   if(isRunning)requestAnimationFrame(liveLoop);
 }
 
-// ─────────────────────────────────────────
-// FREEZE
-// ─────────────────────────────────────────
-function triggerFreeze(){
-  if(!isRunning)return;
-  isRunning=false;
-  clearInterval(intervalTimer);intervalTimer=null;
-  document.getElementById('live-bar').classList.remove('visible');
-  document.getElementById('live-dot').classList.remove('running');
-  document.getElementById('live-media').classList.remove('scanning');
-  // Capture frame
-  const off=document.createElement('canvas');
-  off.width=video.videoWidth||640;off.height=video.videoHeight||480;
-  off.getContext('2d').drawImage(video,0,0);
-  const imgSrc=off.toDataURL('image/jpeg',.85);
-  // Stop camera
-  if(video.srcObject)video.srcObject.getTracks().forEach(t=>t.stop());
-  video.style.display='none';
-  document.getElementById('freeze-btn').style.display='none';
-  document.getElementById('cam-btn').innerHTML='📷 Start Camera';
-  // Show frozen image in live canvas area
-  const img=new Image();img.src=imgSrc;
-  img.onload=async()=>{
-    liveCanvas.width=img.width;liveCanvas.height=img.height;
-    liveCtx.drawImage(img,0,0);
-    playSound('scan');
-    // Show the frozen frame in the video area using a temp img overlay
-    video.style.display='none';
-    const overlay=document.getElementById('freeze-overlay');
-    overlay.src=imgSrc;overlay.style.display='block';
-    const{boxes,scores,cls,sel}=await runInference(img,liveConf);
-    liveCtx.clearRect(0,0,liveCanvas.width,liveCanvas.height);
-    if(sel.length){
-      const{finalCls}=drawBoxes(liveCtx,sel,boxes,scores,cls,liveCanvas.width,liveCanvas.height,liveGlow,liveLabels,liveConfPct);
-      showResults(finalCls,imgSrc,'live');
-    }else{showResults([],imgSrc,'live')}
-  };
-  showToast('📸 Frozen — analyzing…');
+// ── COUNTDOWN ──
+function runCountdown(cb){
+  if(!countdownOn){cb();return}
+  const overlay=document.getElementById('countdown-overlay');
+  const numEl=document.getElementById('countdown-num');
+  overlay.classList.add('active');
+  let n=3;
+  numEl.textContent=n;playSound('countdown');
+  const tick=setInterval(()=>{
+    n--;
+    if(n>0){numEl.textContent=n;playSound('countdown')}
+    else{
+      numEl.textContent='📸';
+      setTimeout(()=>{overlay.classList.remove('active');clearInterval(tick);cb()},600);
+    }
+  },1000);
 }
 
-// ─────────────────────────────────────────
-// CAMERA BUTTON
-// ─────────────────────────────────────────
+// ── FREEZE ──
+function doFreeze(){
+  if(!isRunning||freezeInProgress)return;
+  // Gate: check min symbols
+  if(liveSyms<minSyms){
+    showAlert(`🃏 Only ${liveSyms} symbol${liveSyms===1?'':'s'} visible — need at least ${minSyms} to freeze!`,'fail');
+    showToast(`🃏 Hold the card closer! Need ${minSyms}+ symbols`);
+    return;
+  }
+  freezeInProgress=true;
+  runCountdown(()=>{
+    isRunning=false;freezeInProgress=false;
+    document.getElementById('live-bar').classList.remove('visible');
+    document.getElementById('rec-dot').classList.remove('on');
+    document.getElementById('live-media').classList.remove('scanning');
+    // Capture frame
+    const off=document.createElement('canvas');
+    off.width=video.videoWidth||640;off.height=video.videoHeight||480;
+    off.getContext('2d').drawImage(video,0,0);
+    const imgSrc=off.toDataURL('image/jpeg',.87);
+    if(video.srcObject)video.srcObject.getTracks().forEach(t=>t.stop());
+    video.style.display='none';
+    document.getElementById('freeze-btn').style.display='none';
+    document.getElementById('cam-btn').innerHTML='📷 Start Camera';
+    frameCount=0;
+    // Show frozen frame
+    freezeImg.src=imgSrc;freezeImg.style.display='block';
+    document.getElementById('live-ph').style.display='none';
+    freezeImg.onload=async()=>{
+      liveCanvas.width=freezeImg.clientWidth||off.width;
+      liveCanvas.height=freezeImg.clientHeight||off.height;
+      playSound('scan');
+      document.getElementById('live-media').classList.add('scanning');
+      const{boxes,scores,cls,sel}=await runInference(freezeImg,liveConf);
+      document.getElementById('live-media').classList.remove('scanning');
+      lc.clearRect(0,0,liveCanvas.width,liveCanvas.height);
+      if(sel.length){
+        const{finalCls}=drawBoxes(lc,sel,boxes,scores,cls,liveCanvas.width,liveCanvas.height,liveGlow,liveLabels,liveConfPct);
+        showResults(finalCls,imgSrc,'live');
+      }else showResults([],imgSrc,'live');
+    };
+  });
+}
+
+// ── CAM BUTTON ──
 document.getElementById('cam-btn').addEventListener('click',async()=>{
-  const freezeBtn=document.getElementById('freeze-btn');
-  const overlay=document.getElementById('freeze-overlay');
+  const fb=document.getElementById('freeze-btn');
   if(isRunning){
     isRunning=false;
-    clearInterval(intervalTimer);intervalTimer=null;
     if(video.srcObject)video.srcObject.getTracks().forEach(t=>t.stop());
-    video.style.display='none';overlay.style.display='none';
-    freezeBtn.style.display='none';
+    video.style.display='none';freezeImg.style.display='none';fb.style.display='none';
     document.getElementById('live-bar').classList.remove('visible');
-    document.getElementById('live-dot').classList.remove('running');
+    document.getElementById('rec-dot').classList.remove('on');
     document.getElementById('cam-btn').innerHTML='📷 Start Camera';
-    frameCount=0;updateLiveBar();
+    frameCount=0;liveSyms=0;liveDups=0;
+    document.getElementById('ls-sym').textContent=0;
+    document.getElementById('ls-dup').textContent=0;
+    document.getElementById('ls-frames').textContent=0;
   }else{
-    document.getElementById('results').style.display='none';
+    document.getElementById('live-results').style.display='none';
     document.getElementById('live-ph').style.display='none';
-    overlay.style.display='none';
+    freezeImg.style.display='none';
     try{
       const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}});
       video.srcObject=stream;video.style.display='block';
       document.getElementById('cam-btn').innerHTML='⏹️ Stop Camera';
-      freezeBtn.style.display='inline-flex';
+      fb.style.display='inline-flex';
       document.getElementById('live-bar').classList.add('visible');
-      document.getElementById('live-dot').classList.add('running');
+      document.getElementById('rec-dot').classList.add('on');
       frameCount=0;
-      video.onloadeddata=()=>{
-        isRunning=true;playSound('scan');liveLoop();
-        // Interval timer
-        if(intervalSecs>0){
-          intervalTimer=setInterval(()=>{if(isRunning)triggerFreeze()},intervalSecs*1000);
-        }
-      };
+      video.onloadeddata=()=>{isRunning=true;playSound('scan');liveLoop()};
     }catch(e){
       document.getElementById('live-ph').style.display='flex';
       showToast('❌ Camera access denied!',3000);
@@ -735,132 +704,104 @@ document.getElementById('cam-btn').addEventListener('click',async()=>{
   }
 });
 
-// Freeze button
-document.getElementById('freeze-btn').addEventListener('click',triggerFreeze);
+document.getElementById('freeze-btn').addEventListener('click',doFreeze);
 
-// Add freeze-overlay img to live-media
-(()=>{
-  const img=document.createElement('img');img.id='freeze-overlay';
-  img.style.cssText='width:100%;display:none;border-radius:20px;position:relative;z-index:1';
-  const mc=document.getElementById('live-media');
-  mc.insertBefore(img,document.getElementById('live-canvas'));
-})();
-
-// ─────────────────────────────────────────
-// PHOTO
-// ─────────────────────────────────────────
+// ── UPLOAD ──
 document.getElementById('upload-input').addEventListener('change',async e=>{
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
   r.onload=ev=>{
     imgEl.src=ev.target.result;imgEl.style.display='block';
     document.getElementById('photo-ph').style.display='none';
-    document.getElementById('results2').style.display='none';
+    document.getElementById('photo-results').style.display='none';
     imgEl.onload=async()=>{
       photoCanvas.width=imgEl.clientWidth||imgEl.naturalWidth;
       photoCanvas.height=imgEl.clientHeight||imgEl.naturalHeight;
-      photoCtx.clearRect(0,0,photoCanvas.width,photoCanvas.height);
+      pc.clearRect(0,0,photoCanvas.width,photoCanvas.height);
       document.getElementById('photo-media').classList.add('scanning');
       playSound('scan');
       const{boxes,scores,cls,sel}=await runInference(imgEl,photoConf);
       document.getElementById('photo-media').classList.remove('scanning');
       if(sel.length){
-        const{finalCls}=drawBoxes(photoCtx,sel,boxes,scores,cls,photoCanvas.width,photoCanvas.height,photoGlow,photoLabels,photoConfPct);
+        const{finalCls}=drawBoxes(pc,sel,boxes,scores,cls,photoCanvas.width,photoCanvas.height,photoGlow,photoLabels,photoConfPct);
         showResults(finalCls,ev.target.result,'photo');
-      }else{showResults([],ev.target.result,'photo')}
+      }else showResults([],ev.target.result,'photo');
     };
   };
   r.readAsDataURL(f);e.target.value='';
 });
 
-// Reset
+// ── RESET ──
 document.getElementById('reset-btn').addEventListener('click',()=>{
-  imgEl.style.display='none';document.getElementById('results2').style.display='none';
+  imgEl.style.display='none';document.getElementById('photo-results').style.display='none';
   document.getElementById('photo-ph').style.display='flex';
-  photoCtx.clearRect(0,0,photoCanvas.width,photoCanvas.height);
+  pc.clearRect(0,0,photoCanvas.width,photoCanvas.height);
   stats={scans:0,matches:0,totalSymbols:0};liveHistory=[];photoHistory=[];
   updateStats();renderHistory('live');renderHistory('photo');
   showToast('🔄 Reset! Ready for a new game!');
 });
 
-// ─────────────────────────────────────────
-// LIVE SETTINGS
-// ─────────────────────────────────────────
-document.getElementById('live-conf').addEventListener('input',e=>{liveConf=e.target.value/100;document.getElementById('live-cv').textContent=e.target.value+'%'});
-document.getElementById('photo-conf').addEventListener('input',e=>{photoConf=e.target.value/100;document.getElementById('photo-cv').textContent=e.target.value+'%'});
-
-document.getElementById('min-dups-slider').addEventListener('input',e=>{minDups=+e.target.value;document.getElementById('min-dups-val').textContent=e.target.value});
-document.getElementById('interval-slider').addEventListener('input',e=>{
-  intervalSecs=+e.target.value;
-  document.getElementById('interval-val').textContent=intervalSecs===0?'Off':intervalSecs+'s';
-  clearInterval(intervalTimer);intervalTimer=null;
-  if(isRunning&&intervalSecs>0)intervalTimer=setInterval(()=>{if(isRunning)triggerFreeze()},intervalSecs*1000);
-});
-
-function makeTog(id,setter){const b=document.getElementById(id);b.addEventListener('click',()=>{setter(b.classList.toggle('on'))})}
+// ── TOGGLES ──
+function makeTog(id,setter){const b=document.getElementById(id);b.addEventListener('click',()=>setter(b.classList.toggle('on')))}
 makeTog('live-glow',v=>{liveGlow=v});
 makeTog('live-labels',v=>{liveLabels=v});
 makeTog('live-confpct',v=>{liveConfPct=v});
+makeTog('live-hist-tog',v=>{liveHistOn=v;renderHistory('live')});
 makeTog('photo-glow',v=>{photoGlow=v});
 makeTog('photo-labels',v=>{photoLabels=v});
 makeTog('photo-confpct',v=>{photoConfPct=v});
 makeTog('photo-hist-tog',v=>{photoHistOn=v;renderHistory('photo')});
-makeTog('auto-freeze-tog',v=>{
-  autoFreeze=v;
-  showToast(v?'🤖 Auto-Freeze ON — will freeze when match found!':'🤖 Auto-Freeze OFF',2500);
+makeTog('countdown-tog',v=>{countdownOn=v;showToast(v?'⏳ Countdown Freeze ON':'⏳ Countdown Freeze OFF')});
+
+document.getElementById('live-conf').addEventListener('input',e=>{liveConf=e.target.value/100;document.getElementById('live-cv').textContent=e.target.value+'%'});
+document.getElementById('photo-conf').addEventListener('input',e=>{photoConf=e.target.value/100;document.getElementById('photo-cv').textContent=e.target.value+'%'});
+document.getElementById('min-sym-slider').addEventListener('input',e=>{
+  minSyms=+e.target.value;document.getElementById('min-sym-val').textContent=e.target.value;
+  showToast(`🃏 Min symbols set to ${e.target.value}`);
 });
 
-// ─────────────────────────────────────────
-// MODE TABS
-// ─────────────────────────────────────────
+// ── MODE TABS ──
 document.querySelectorAll('.mode-tab').forEach(btn=>{
   btn.addEventListener('click',()=>{
     document.querySelectorAll('.mode-tab').forEach(b=>b.classList.remove('active'));
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
-    // Stop camera when switching away
     if(btn.dataset.tab==='photo'&&isRunning)document.getElementById('cam-btn').click();
   });
 });
 
-// ─────────────────────────────────────────
-// TOP BAR
-// ─────────────────────────────────────────
+// ── MODAL ──
 document.getElementById('help-btn').addEventListener('click',()=>document.getElementById('modal-overlay').classList.add('open'));
 document.getElementById('modal-close').addEventListener('click',()=>document.getElementById('modal-overlay').classList.remove('open'));
 document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target.id==='modal-overlay')document.getElementById('modal-overlay').classList.remove('open')});
-
 document.querySelectorAll('.modal-tab').forEach(t=>{
   t.addEventListener('click',()=>{
     document.querySelectorAll('.modal-tab').forEach(x=>x.classList.remove('active'));
     document.querySelectorAll('.modal-panel').forEach(x=>x.classList.remove('active'));
-    t.classList.add('active');
-    document.getElementById('mtab-'+t.dataset.mtab).classList.add('active');
+    t.classList.add('active');document.getElementById('mt-'+t.dataset.mt).classList.add('active');
   });
 });
 
-document.getElementById('dark-toggle').addEventListener('click',()=>{
+// ── TOP BUTTONS ──
+document.getElementById('dark-btn').addEventListener('click',()=>{
   document.body.classList.toggle('dark');
-  document.getElementById('dark-toggle').textContent=document.body.classList.contains('dark')?'☀️':'🌙';
+  document.getElementById('dark-btn').textContent=document.body.classList.contains('dark')?'☀️':'🌙';
   showToast(document.body.classList.contains('dark')?'🌙 Dark mode':'☀️ Light mode');
 });
-document.getElementById('sound-toggle').addEventListener('click',()=>{
-  soundOn=!soundOn;
-  document.getElementById('sound-toggle').textContent=soundOn?'🔊':'🔇';
+document.getElementById('sound-btn').addEventListener('click',()=>{
+  soundOn=!soundOn;document.getElementById('sound-btn').textContent=soundOn?'🔊':'🔇';
   showToast(soundOn?'🔊 Sound on':'🔇 Sound off');
 });
 document.getElementById('share-btn').addEventListener('click',async()=>{
   if(navigator.share){try{await navigator.share({title:'Spot It! AI Solver',url:location.href})}catch(e){}}
-  else{navigator.clipboard.writeText(location.href).then(()=>showToast('🔗 Link copied!'))}
+  else navigator.clipboard.writeText(location.href).then(()=>showToast('🔗 Link copied!'));
 });
 document.getElementById('stats-btn').addEventListener('click',()=>{
   showToast(`📊 ${stats.scans} scans · ${stats.matches} matches · ${stats.totalSymbols} symbols`,3500);
 });
 
-// ─────────────────────────────────────────
-// INIT
-// ─────────────────────────────────────────
+// ── INIT ──
 updateStats();
 loadModel();
 </script>
