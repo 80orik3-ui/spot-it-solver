@@ -367,7 +367,38 @@ body.dark .dup-item{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.
 .dup-name{font-size:12px;font-weight:900;color:var(--text);text-transform:capitalize;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dup-x{background:var(--green);color:#fff;border-radius:50px;padding:2px 9px;font-size:11px;font-weight:900;flex-shrink:0;border:2px solid #1a1a2e}
 .no-dup{text-align:center;padding:11px;font-size:14px;font-weight:800;color:var(--red)}
-/* TOP 3 */
+/* SESSION TOP 3 */
+.session-top3{
+  background:var(--card);border-radius:18px;
+  padding:16px 18px;margin-bottom:22px;
+  border:3px solid #f59e0b;
+  box-shadow:4px 4px 0 #f59e0b;
+}
+.st3-title{font-family:'Fredoka One',cursive;font-size:14px;color:#92400e;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+body.dark .st3-title{color:#fbbf24}
+.st3-row{display:flex;gap:10px;flex-wrap:wrap}
+.st3-item{
+  flex:1;min-width:90px;
+  background:#fffbeb;border-radius:14px;
+  border:2.5px solid #1a1a2e;
+  padding:10px 8px;text-align:center;
+  position:relative;
+  transition:transform .2s;
+}
+.st3-item:hover{transform:translateY(-3px)}
+.st3-item:nth-child(1){border-color:#f59e0b;box-shadow:3px 3px 0 #f59e0b;background:#fffbeb}
+.st3-item:nth-child(2){border-color:#94a3b8;box-shadow:3px 3px 0 #94a3b8;background:#f8fafc}
+.st3-item:nth-child(3){border-color:#b45309;box-shadow:3px 3px 0 #b45309;background:#fef9c3}
+body.dark .st3-item{background:rgba(30,30,50,.8)}
+body.dark .st3-item:nth-child(1){background:rgba(245,158,11,.12)}
+body.dark .st3-item:nth-child(2){background:rgba(148,163,184,.1)}
+body.dark .st3-item:nth-child(3){background:rgba(180,83,9,.12)}
+.st3-medal{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:20px;line-height:1}
+.st3-emoji{font-size:28px;display:block;margin:10px 0 4px}
+.st3-name{font-size:11px;font-weight:900;color:var(--text);text-transform:capitalize;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st3-bar-wrap{margin-top:6px;height:5px;background:rgba(0,0,0,.08);border-radius:3px;overflow:hidden}
+.st3-bar{height:100%;border-radius:3px;background:linear-gradient(90deg,#f59e0b,#ef4444);transition:width .5s ease}
+.st3-count{display:inline-block;margin-top:5px;background:#1a1a2e;color:#fff;border-radius:50px;padding:1px 9px;font-size:11px;font-weight:900}
 .top3-section{margin-top:16px;padding-top:14px;border-top:2.5px dashed var(--border)}
 .top3-title{font-family:'Fredoka One',cursive;font-size:13px;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .top3-row{display:flex;gap:9px;flex-wrap:wrap}
@@ -522,6 +553,12 @@ body.dark .modal{border-color:rgba(255,255,255,.2)}
     <div class="sc"><div class="sc-val" id="sc-symbols">0</div><div class="sc-lbl">✨ Symbols</div></div>
   </div>
 
+  <!-- SESSION TOP 3 -->
+  <div class="session-top3" id="session-top3" style="display:none">
+    <div class="st3-title">🏆 Most Common Symbols This Session</div>
+    <div class="st3-row" id="st3-row"></div>
+  </div>
+
   <!-- STATUS -->
   <div class="status-wrap">
     <div class="status-pill" id="status-pill">
@@ -644,6 +681,7 @@ let liveGlow=true,liveLabels=true,liveConfPct=true,liveHistOn=true;
 let photoGlow=true,photoLabels=true,photoConfPct=true,photoHistOn=true;
 let liveHistory=[],photoHistory=[];
 let stats={scans:0,matches:0,totalSymbols:0};
+let sessionSymbolCounts={}; // tracks all symbols across all scans
 let frameCount=0,liveSyms=0,liveDups=0;
 const video=document.getElementById('video');
 const imgEl=document.getElementById('img-el');
@@ -655,7 +693,32 @@ const pc=photoCanvas.getContext('2d');
 
 function setStatus(m,s){document.getElementById('status-txt').textContent=m;document.getElementById('status-pill').className='status-pill'+(s?' '+s:'')}
 function showToast(m,d=2600){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),d)}
-function updateStats(){document.getElementById('sc-scans').textContent=stats.scans;document.getElementById('sc-matches').textContent=stats.matches;document.getElementById('sc-symbols').textContent=stats.totalSymbols}
+function updateStats(){
+  document.getElementById('sc-scans').textContent=stats.scans;
+  document.getElementById('sc-matches').textContent=stats.matches;
+  document.getElementById('sc-symbols').textContent=stats.totalSymbols;
+  renderSessionTop3();
+}
+
+function renderSessionTop3(){
+  const sec=document.getElementById('session-top3');
+  const row=document.getElementById('st3-row');
+  const entries=Object.entries(sessionSymbolCounts);
+  if(entries.length===0){sec.style.display='none';return}
+  sec.style.display='block';
+  // Sort by count desc, then name asc to break ties deterministically
+  entries.sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));
+  const top3=entries.slice(0,3);
+  const maxCount=top3[0][1];
+  const medals=['🥇','🥈','🥉'];
+  row.innerHTML='';
+  top3.forEach(([name,n],i)=>{
+    const pct=Math.round((n/maxCount)*100);
+    const div=document.createElement('div');div.className='st3-item';
+    div.innerHTML=`<span class="st3-medal">${medals[i]}</span><span class="st3-emoji">${emojiMap[name]||'🔹'}</span><div class="st3-name">${name.replace(/_/g,' ')}</div><div class="st3-bar-wrap"><div class="st3-bar" style="width:${pct}%"></div></div><span class="st3-count">×${n}</span>`;
+    row.appendChild(div);
+  });
+}
 function showAlert(m,t='ok'){const b=document.getElementById('alert-banner');b.textContent=m;b.className='alert-banner visible'+(t==='fail'?' fail':'');clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove('visible'),4000)}
 
 function playSound(type){
@@ -768,7 +831,10 @@ function drawBoxes(ctx,sel,boxes,scores,cls,W,H,glow,labels,confPct){
 function showResults(detected,imgSrc,mode){
   const counts={};detected.forEach(c=>{counts[c]=(counts[c]||0)+1});
   const dups=Object.entries(counts).filter(([,n])=>n>1);
-  stats.scans++;stats.totalSymbols+=detected.length;if(dups.length>0)stats.matches++;updateStats();
+  stats.scans++;stats.totalSymbols+=detected.length;if(dups.length>0)stats.matches++;
+  // Accumulate into session-wide tracker
+  detected.forEach(name=>{sessionSymbolCounts[name]=(sessionSymbolCounts[name]||0)+1});
+  updateStats();
   const arr=mode==='live'?liveHistory:photoHistory;
   if(imgSrc){arr.unshift({src:imgSrc,count:detected.length,dups:dups.length});if(arr.length>8)arr.pop();renderHistory(mode)}
   const p=mode==='live'?'lr':'pr';
@@ -936,7 +1002,7 @@ document.getElementById('reset-btn').addEventListener('click',()=>{
   imgEl.style.display='none';document.getElementById('photo-results').style.display='none';
   document.getElementById('photo-ph').style.display='flex';
   pc.clearRect(0,0,photoCanvas.width,photoCanvas.height);
-  stats={scans:0,matches:0,totalSymbols:0};liveHistory=[];photoHistory=[];
+  stats={scans:0,matches:0,totalSymbols:0};sessionSymbolCounts={};liveHistory=[];photoHistory=[];
   updateStats();renderHistory('live');renderHistory('photo');
   showToast('🔄 Reset! Ready for a new game!');
 });
