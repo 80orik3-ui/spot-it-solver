@@ -767,6 +767,41 @@ function drawHintBoxes(ctx,sel,boxes,scores,cls,W,H,matchName){
   }
 }
 
+// ─── DRAWING: ANALYST MODE (all symbols, single color) ───────────────────────
+function drawAnalystBoxes(ctx,sel,boxes,scores,cls,W,H,glow,labels,confPct){
+  const col='#0ea5e9';
+  const usedRects=[];
+  function overlaps(r){return usedRects.some(u=>!(r.x+r.w<u.x||r.x>u.x+u.w||r.y+r.h<u.y||r.y>u.y+u.h))}
+  for(let i=0;i<sel.length;i++){
+    const idx=sel[i];
+    const name=classNames[cls[idx]]||'Unknown';
+    const b=boxes[idx],sc=(scores[idx]*100).toFixed(0);
+    const yn=(b[0]/640)*H,xn=(b[1]/640)*W,yx=(b[2]/640)*H,xx=(b[3]/640)*W;
+    if(glow){
+      ctx.shadowColor=col;ctx.shadowBlur=18;
+      ctx.strokeStyle=col+'44';ctx.lineWidth=8;
+      ctx.beginPath();if(ctx.roundRect)ctx.roundRect(xn-3,yn-3,xx-xn+6,yx-yn+6,8);else ctx.rect(xn-3,yn-3,xx-xn+6,yx-yn+6);ctx.stroke();
+    }
+    const r=5;
+    ctx.strokeStyle=col;ctx.lineWidth=3;ctx.shadowBlur=glow?12:0;
+    ctx.beginPath();ctx.moveTo(xn+r,yn);ctx.lineTo(xx-r,yn);ctx.quadraticCurveTo(xx,yn,xx,yn+r);ctx.lineTo(xx,yx-r);ctx.quadraticCurveTo(xx,yx,xx-r,yx);ctx.lineTo(xn+r,yx);ctx.quadraticCurveTo(xn,yx,xn,yx-r);ctx.lineTo(xn,yn+r);ctx.quadraticCurveTo(xn,yn,xn+r,yn);ctx.closePath();ctx.stroke();ctx.shadowBlur=0;
+    if(labels){
+      const dn=name.replace(/_/g,' '),lbl=confPct?`${dn} ${sc}%`:dn;
+      ctx.font='bold 11px Nunito,Arial';
+      const tw=ctx.measureText(lbl).width+12,lh=19;
+      const candidates=[{x:xn,y:yn-lh-2},{x:xn,y:yx+2},{x:xn,y:yn+2}];
+      let chosen=candidates[0];
+      for(const cand of candidates){
+        const cr={x:Math.max(0,Math.min(cand.x,W-tw)),y:Math.max(0,Math.min(cand.y,H-lh)),w:tw,h:lh};
+        if(!overlaps(cr)){chosen={x:cr.x,y:cr.y};usedRects.push(cr);break}
+        if(cand===candidates[candidates.length-1]){cr.x=Math.max(0,Math.min(cand.x,W-tw));cr.y=Math.max(0,Math.min(cand.y,H-lh));chosen={x:cr.x,y:cr.y};usedRects.push(cr)}
+      }
+      ctx.fillStyle=col;ctx.beginPath();if(ctx.roundRect)ctx.roundRect(chosen.x,chosen.y,tw,lh,5);else ctx.fillRect(chosen.x,chosen.y,tw,lh);ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='bold 11px Nunito,Arial';ctx.fillText(lbl,chosen.x+6,chosen.y+13);
+    }
+  }
+}
+
 // ─── DRAWING DISPATCHER ───────────────────────────────────────────────────────
 function processDrawing(ctx,sel,boxes,scores,cls,W,H,glow,labels,confPct){
   const counts={};
@@ -774,6 +809,8 @@ function processDrawing(ctx,sel,boxes,scores,cls,W,H,glow,labels,confPct){
   finalCls.forEach(c=>{counts[c]=(counts[c]||0)+1});
   if(gameMode==='classic'){
     drawClassicBoxes(ctx,sel,boxes,scores,cls,W,H,glow,labels,confPct,counts);
+  } else if(gameMode==='prediction'){
+    drawAnalystBoxes(ctx,sel,boxes,scores,cls,W,H,glow,labels,confPct);
   } else if(gameMode==='speed'&&speed.hintShown&&speed.currentMatch){
     drawHintBoxes(ctx,sel,boxes,scores,cls,W,H,speed.currentMatch);
   }
@@ -832,6 +869,14 @@ function handleSpeedKey(name){
     statusEl.textContent=`✅ Correct! You got it in ${elapsed}s!`;
     statusEl.className='speed-status success';
     if(btn){btn.classList.add('correct');setTimeout(()=>btn.classList.remove('correct'),1500)}
+    // Show hint boxes on canvas to reveal the match
+    speed.hintShown=true;
+    const activeLive=document.getElementById('panel-live').classList.contains('active');
+    const revCtx=activeLive?lc:pc;
+    const revW=activeLive?liveCanvas.width:photoCanvas.width;
+    const revH=activeLive?liveCanvas.height:photoCanvas.height;
+    revCtx.clearRect(0,0,revW,revH);
+    drawHintBoxes(revCtx,speed.lastSel,speed.lastBoxes,speed.lastScores,speed.lastCls,revW,revH,speed.currentMatch);
     flashScreen('green');playSound('match');launchConfetti();showToast(`🎉 Correct! ${elapsed}s`);
     setTimeout(()=>{
       document.querySelectorAll('.speed-key').forEach(k=>k.classList.add('disabled'));
