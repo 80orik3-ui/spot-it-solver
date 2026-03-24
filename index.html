@@ -753,16 +753,19 @@ function drawHintBoxes(ctx,sel,boxes,scores,cls,W,H,matchName){
     if((classNames[cls[idx]]||'Unknown')!==matchName)continue;
     const b=boxes[idx];
     const yn=(b[0]/640)*H,xn=(b[1]/640)*W,yx=(b[2]/640)*H,xx=(b[3]/640)*W;
-    ctx.shadowColor=col;ctx.shadowBlur=28;
-    ctx.strokeStyle=col+'44';ctx.lineWidth=12;
-    ctx.beginPath();if(ctx.roundRect)ctx.roundRect(xn-4,yn-4,xx-xn+8,yx-yn+8,10);else ctx.rect(xn-4,yn-4,xx-xn+8,yx-yn+8);ctx.stroke();
-    const r=5;
-    ctx.strokeStyle=col;ctx.lineWidth=4;ctx.shadowBlur=18;
-    ctx.beginPath();ctx.moveTo(xn+r,yn);ctx.lineTo(xx-r,yn);ctx.quadraticCurveTo(xx,yn,xx,yn+r);ctx.lineTo(xx,yx-r);ctx.quadraticCurveTo(xx,yx,xx-r,yx);ctx.lineTo(xn+r,yx);ctx.quadraticCurveTo(xn,yx,xn,yx-r);ctx.lineTo(xn,yn+r);ctx.quadraticCurveTo(xn,yn,xn+r,yn);ctx.closePath();ctx.stroke();ctx.shadowBlur=0;
+    const r=6;
+    // Outer glow stroke only (hollow)
+    ctx.shadowColor=col;ctx.shadowBlur=20;
+    ctx.strokeStyle=col;ctx.lineWidth=4;
+    ctx.beginPath();ctx.moveTo(xn+r,yn);ctx.lineTo(xx-r,yn);ctx.quadraticCurveTo(xx,yn,xx,yn+r);ctx.lineTo(xx,yx-r);ctx.quadraticCurveTo(xx,yx,xx-r,yx);ctx.lineTo(xn+r,yx);ctx.quadraticCurveTo(xn,yx,xn,yx-r);ctx.lineTo(xn,yn+r);ctx.quadraticCurveTo(xn,yn,xn+r,yn);ctx.closePath();ctx.stroke();
+    // Second thinner pass for crisp edge
+    ctx.shadowBlur=0;ctx.strokeStyle='#fff';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(xn+r,yn);ctx.lineTo(xx-r,yn);ctx.quadraticCurveTo(xx,yn,xx,yn+r);ctx.lineTo(xx,yx-r);ctx.quadraticCurveTo(xx,yx,xx-r,yx);ctx.lineTo(xn+r,yx);ctx.quadraticCurveTo(xn,yx,xn,yx-r);ctx.lineTo(xn,yn+r);ctx.quadraticCurveTo(xn,yn,xn+r,yn);ctx.closePath();ctx.stroke();
+    // Label
     const lbl=`${emojiMap[matchName]||'?'} ${matchName.replace(/_/g,' ')} 💡`;
     ctx.font='bold 12px Nunito,Arial';const tw=ctx.measureText(lbl).width+12,lh=20;
     const lx=Math.max(0,Math.min(xn,W-tw)),ly=Math.max(0,yn-lh-3);
-    ctx.fillStyle=col;if(ctx.roundRect)ctx.roundRect(lx,ly,tw,lh,5);else ctx.fillRect(lx,ly,tw,lh);ctx.fill();
+    ctx.fillStyle=col;ctx.shadowBlur=0;if(ctx.roundRect){ctx.beginPath();ctx.roundRect(lx,ly,tw,lh,5);ctx.fill();}else ctx.fillRect(lx,ly,tw,lh);
     ctx.fillStyle='#fff';ctx.fillText(lbl,lx+6,ly+14);
   }
 }
