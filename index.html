@@ -1047,14 +1047,23 @@ function handleSpeedKey(name){
   if(name===speed.currentMatch){
     const elapsed=((Date.now()-speed.timerStart)/1000).toFixed(1);
     if(btn){btn.classList.add('correct');setTimeout(()=>btn.classList.remove('correct'),1500)}
-    // Reveal boxes for this match
+    // Reveal boxes for this match on canvas(es)
     speed.hintShown=true;
     const activeLive=document.getElementById('panel-live').classList.contains('active');
-    const revCtx=activeLive?lc:pc;
-    const revW=activeLive?liveCanvas.width:photoCanvas.width;
-    const revH=activeLive?liveCanvas.height:photoCanvas.height;
-    revCtx.clearRect(0,0,revW,revH);
-    drawHintBoxes(revCtx,speed.lastSel,speed.lastBoxes,speed.lastScores,speed.lastCls,revW,revH,speed.currentMatch);
+    const activeTwoCard=document.getElementById('panel-twocard').classList.contains('active');
+    if(activeTwoCard){
+      // Draw on both cards
+      tcA.ctx.clearRect(0,0,tcA.W,tcA.H);
+      tcB.ctx.clearRect(0,0,tcB.W,tcB.H);
+      drawHintBoxes(tcA.ctx,tcA.sel,tcA.boxes,tcA.scores,tcA.cls,tcA.W,tcA.H,speed.currentMatch);
+      drawHintBoxes(tcB.ctx,tcB.sel,tcB.boxes,tcB.scores,tcB.cls,tcB.W,tcB.H,speed.currentMatch);
+    } else {
+      const revCtx=activeLive?lc:pc;
+      const revW=activeLive?liveCanvas.width:photoCanvas.width;
+      const revH=activeLive?liveCanvas.height:photoCanvas.height;
+      revCtx.clearRect(0,0,revW,revH);
+      drawHintBoxes(revCtx,speed.lastSel,speed.lastBoxes,speed.lastScores,speed.lastCls,revW,revH,speed.currentMatch);
+    }
     speed.dupsIndex++;
     const total=speed.dupsList.length;
     const statusEl=document.getElementById('speed-status');
@@ -1403,6 +1412,11 @@ document.querySelectorAll('.mode-tab').forEach(btn=>{
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
     btn.classList.add('active');document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
     if(btn.dataset.tab==='photo'&&isRunning)document.getElementById('cam-btn').click();
+    // Two-card doesn't work with Analyst mode — switch to Classic
+    if(btn.dataset.tab==='twocard'&&gameMode==='prediction'){
+      switchGameMode('classic');
+      showToast('🎯 Switched to Classic — Analyst has no point in Two-Card mode');
+    }
     document.getElementById('prediction-panel').classList.toggle('show',gameMode==='prediction');
     document.getElementById('speed-panel').classList.toggle('show',gameMode==='speed');
   });
@@ -1424,12 +1438,20 @@ document.querySelectorAll('.mode-tab').forEach(btn=>{
 document.getElementById('speed-hint-btn').addEventListener('click',()=>{
   if(!speed.roundActive){showToast('⚡ Start a round first!');return}
   speed.hintShown=true;
+  const activeTwoCard=document.getElementById('panel-twocard').classList.contains('active');
   const activeLive=document.getElementById('panel-live').classList.contains('active');
-  const ctx=activeLive?lc:pc;
-  const W=activeLive?liveCanvas.width:photoCanvas.width;
-  const H=activeLive?liveCanvas.height:photoCanvas.height;
-  ctx.clearRect(0,0,W,H);
-  drawHintBoxes(ctx,speed.lastSel,speed.lastBoxes,speed.lastScores,speed.lastCls,W,H,speed.currentMatch);
+  if(activeTwoCard){
+    tcA.ctx.clearRect(0,0,tcA.W,tcA.H);
+    tcB.ctx.clearRect(0,0,tcB.W,tcB.H);
+    drawHintBoxes(tcA.ctx,tcA.sel,tcA.boxes,tcA.scores,tcA.cls,tcA.W,tcA.H,speed.currentMatch);
+    drawHintBoxes(tcB.ctx,tcB.sel,tcB.boxes,tcB.scores,tcB.cls,tcB.W,tcB.H,speed.currentMatch);
+  } else {
+    const ctx=activeLive?lc:pc;
+    const W=activeLive?liveCanvas.width:photoCanvas.width;
+    const H=activeLive?liveCanvas.height:photoCanvas.height;
+    ctx.clearRect(0,0,W,H);
+    drawHintBoxes(ctx,speed.lastSel,speed.lastBoxes,speed.lastScores,speed.lastCls,W,H,speed.currentMatch);
+  }
   document.querySelectorAll('.speed-key').forEach(k=>{
     k.classList.remove('hint-hl');
     if(k.dataset.sym===speed.currentMatch)k.classList.add('hint-hl');
@@ -1492,8 +1514,10 @@ async function analyzeTwoCardSlot(slot,imgEl,canvasEl,ctx,side){
   document.getElementById('tc-suspicious').classList.toggle('show',suspicious&&(tcA.ready||tcB.ready));
   slot.ready=true;slot.sel=sel;slot.boxes=boxes;slot.scores=scores;slot.cls=cls;slot.counts=counts;slot.W=W;slot.H=H;slot.ctx=ctx;
   recordSymbolDetections(counts);
-  // Draw all symbols on this card in neutral style while waiting for other card
-  drawAnalystBoxes(ctx,sel,boxes,scores,cls,W,H,true,true,false);
+  // Only draw analyst preview boxes while waiting if NOT in speed mode
+  if(gameMode!=='speed'){
+    drawAnalystBoxes(ctx,sel,boxes,scores,cls,W,H,true,true,false);
+  }
   if(tcA.ready&&tcB.ready)showTwoCardResult();
 }
 
@@ -1501,7 +1525,23 @@ function showTwoCardResult(){
   const sharedNames=new Set(Object.keys(tcA.counts).filter(n=>tcB.counts[n]));
   const colorMap={};
   [...sharedNames].forEach((n,i)=>{colorMap[n]=CLASSIC_PALETTE[i%CLASSIC_PALETTE.length]});
-  // Redraw both canvases highlighting only shared symbols
+
+  if(gameMode==='speed'){
+    // In Speed mode: build counts from shared symbols only, set up round without revealing boxes
+    const counts={};
+    [...sharedNames].forEach(name=>{
+      const countA=tcA.counts[name]||0;
+      const countB=tcB.counts[name]||0;
+      counts[name]=countA+countB; // guaranteed ≥2
+    });
+    // Use card A as the reference canvas for hint drawing
+    setupSpeedRound(counts,tcA.sel,tcA.boxes,tcA.scores,tcA.cls,tcA.ctx,tcA.W,tcA.H);
+    document.getElementById('speed-panel').classList.add('show');
+    showToast(`⚡ ${sharedNames.size} shared symbol${sharedNames.size>1?'s':''} — find them!`);
+    return;
+  }
+
+  // Classic / Analyst: redraw both canvases highlighting shared symbols
   tcA.ctx.clearRect(0,0,tcA.W,tcA.H);tcB.ctx.clearRect(0,0,tcB.W,tcB.H);
   drawTwoCardHighlight(tcA.ctx,tcA.sel,tcA.boxes,tcA.cls,tcA.W,tcA.H,sharedNames,colorMap);
   drawTwoCardHighlight(tcB.ctx,tcB.sel,tcB.boxes,tcB.cls,tcB.W,tcB.H,sharedNames,colorMap);
@@ -1526,7 +1566,7 @@ function showTwoCardResult(){
     result.className='tc-result none';head.className='tc-result-head none';
     document.getElementById('tc-result-icon').textContent='🤔';
     document.getElementById('tc-result-title').textContent='No Shared Symbols!';
-    document.getElementById('tc-result-sub').textContent='These cards have no symbols in common — check detection confidence';
+    document.getElementById('tc-result-sub').textContent='These cards have no symbols in common — try lowering the confidence threshold';
     document.getElementById('tc-shared-grid').innerHTML='<div style="font-size:13px;font-weight:800;color:var(--red)">❌ No matching symbols detected.</div>';
     showToast('🤔 No shared symbols found!');
   }
