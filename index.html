@@ -636,7 +636,7 @@ const GM_INFO={
 const CLASSIC_PALETTE=['#f97316','#8b5cf6','#06b6d4','#ec4899','#eab308','#10b981','#3b82f6','#ef4444','#14b8a6','#a855f7','#84cc16','#f43f5e'];
 
 // ─── SPEED STATE ──────────────────────────────────────────────────────────────
-const speed={score:0,bestTime:null,timerInterval:null,timerStart:null,currentMatch:null,roundActive:false,hintShown:false,lastSel:null,lastBoxes:null,lastScores:null,lastCls:null,lastCounts:null,lastCtx:null,lastW:0,lastH:0};
+const speed={score:0,bestTime:null,timerInterval:null,timerStart:null,currentMatch:null,dupsList:[],dupsIndex:0,roundActive:false,hintShown:false,lastSel:null,lastBoxes:null,lastScores:null,lastCls:null,lastCounts:null,lastCtx:null,lastW:0,lastH:0};
 
 // ─── UTILITIES ────────────────────────────────────────────────────────────────
 function setStatus(m,s){document.getElementById('status-txt').textContent=m;document.getElementById('status-pill').className='status-pill'+(s?' '+s:'')}
@@ -841,7 +841,7 @@ function setupSpeedRound(counts,sel,boxes,scores,cls,ctx,W,H){
   const statusEl=document.getElementById('speed-status');
   document.querySelectorAll('.speed-key').forEach(k=>k.classList.remove('correct','wrong','hint-hl','disabled'));
   if(dups.length===0){
-    speed.roundActive=false;speed.currentMatch=null;
+    speed.roundActive=false;speed.currentMatch=null;speed.dupsList=[];speed.dupsIndex=0;
     stopSpeedTimer();resetSpeedTimerDisplay();
     statusEl.textContent='❌ No match found on this card!';
     statusEl.className='speed-status fail-s';
@@ -850,9 +850,12 @@ function setupSpeedRound(counts,sel,boxes,scores,cls,ctx,W,H){
   }
   speed.lastSel=sel;speed.lastBoxes=boxes;speed.lastScores=scores;speed.lastCls=cls;
   speed.lastCounts=counts;speed.lastCtx=ctx;speed.lastW=W;speed.lastH=H;
-  speed.currentMatch=dups[0][0];
+  speed.dupsList=dups.map(([name])=>name);
+  speed.dupsIndex=0;
+  speed.currentMatch=speed.dupsList[0];
   speed.roundActive=true;speed.hintShown=false;
-  statusEl.textContent='⚡ Find the match! Tap it on the keyboard!';
+  const total=speed.dupsList.length;
+  statusEl.textContent=total>1?`⚡ Find all ${total} matches! (1/${total}) — tap: ${speed.currentMatch.replace(/_/g,' ')}`:`⚡ Find the match! Tap it on the keyboard!`;
   statusEl.className='speed-status active';
   startSpeedTimer();
 }
@@ -861,18 +864,9 @@ function handleSpeedKey(name){
   if(!speed.roundActive)return;
   const btn=document.querySelector(`.speed-key[data-sym="${name}"]`);
   if(name===speed.currentMatch){
-    stopSpeedTimer();
     const elapsed=((Date.now()-speed.timerStart)/1000).toFixed(1);
-    speed.score++;speed.roundActive=false;
-    if(!speed.bestTime||parseFloat(elapsed)<speed.bestTime)speed.bestTime=parseFloat(elapsed);
-    document.getElementById('speed-score-val').textContent=speed.score;
-    document.getElementById('speed-best-val').textContent=speed.bestTime+'s';
-    document.getElementById('speed-timer-val').textContent=elapsed+'s';
-    const statusEl=document.getElementById('speed-status');
-    statusEl.textContent=`✅ Correct! You got it in ${elapsed}s!`;
-    statusEl.className='speed-status success';
     if(btn){btn.classList.add('correct');setTimeout(()=>btn.classList.remove('correct'),1500)}
-    // Show hint boxes on canvas to reveal the match
+    // Reveal boxes for this match
     speed.hintShown=true;
     const activeLive=document.getElementById('panel-live').classList.contains('active');
     const revCtx=activeLive?lc:pc;
@@ -880,12 +874,38 @@ function handleSpeedKey(name){
     const revH=activeLive?liveCanvas.height:photoCanvas.height;
     revCtx.clearRect(0,0,revW,revH);
     drawHintBoxes(revCtx,speed.lastSel,speed.lastBoxes,speed.lastScores,speed.lastCls,revW,revH,speed.currentMatch);
-    flashScreen('green');playSound('match');launchConfetti();showToast(`🎉 Correct! ${elapsed}s`);
-    setTimeout(()=>{
-      document.querySelectorAll('.speed-key').forEach(k=>k.classList.add('disabled'));
-      document.getElementById('speed-status').textContent='Upload or freeze another card to continue!';
-      document.getElementById('speed-status').className='speed-status';
-    },1500);
+    speed.dupsIndex++;
+    const total=speed.dupsList.length;
+    const statusEl=document.getElementById('speed-status');
+    if(speed.dupsIndex<total){
+      // More dups to find — advance to next
+      speed.currentMatch=speed.dupsList[speed.dupsIndex];
+      speed.hintShown=false;
+      // Remove hint highlight from keyboard
+      document.querySelectorAll('.speed-key').forEach(k=>k.classList.remove('hint-hl'));
+      statusEl.textContent=`✅ +1! Now find: ${speed.currentMatch.replace(/_/g,' ')} (${speed.dupsIndex+1}/${total})`;
+      statusEl.className='speed-status active';
+      playSound('scan');
+      flashScreen('green');
+      showToast(`✅ Got it! ${speed.dupsIndex}/${total} — find the next!`);
+    } else {
+      // All dups found — round complete
+      stopSpeedTimer();
+      speed.score++;speed.roundActive=false;
+      if(!speed.bestTime||parseFloat(elapsed)<speed.bestTime)speed.bestTime=parseFloat(elapsed);
+      document.getElementById('speed-score-val').textContent=speed.score;
+      document.getElementById('speed-best-val').textContent=speed.bestTime+'s';
+      document.getElementById('speed-timer-val').textContent=elapsed+'s';
+      statusEl.textContent=total>1?`🏆 All ${total} found in ${elapsed}s!`:`✅ Correct! You got it in ${elapsed}s!`;
+      statusEl.className='speed-status success';
+      flashScreen('green');playSound('match');launchConfetti();
+      showToast(total>1?`🏆 All ${total} matches! ${elapsed}s`:`🎉 Correct! ${elapsed}s`);
+      setTimeout(()=>{
+        document.querySelectorAll('.speed-key').forEach(k=>k.classList.add('disabled'));
+        statusEl.textContent='Upload or freeze another card to continue!';
+        statusEl.className='speed-status';
+      },1500);
+    }
   } else {
     if(btn){btn.classList.add('wrong');setTimeout(()=>btn.classList.remove('wrong'),500)}
     flashScreen('red');playSound('error');
