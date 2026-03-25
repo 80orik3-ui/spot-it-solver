@@ -1146,6 +1146,18 @@ function switchGameMode(newMode){
   document.querySelectorAll('.gm-tab').forEach(t=>t.classList.toggle('active',t.dataset.gm===newMode));
   document.getElementById('prediction-panel').classList.toggle('show',newMode==='prediction');
   document.getElementById('speed-panel').classList.toggle('show',newMode==='speed');
+  // Hide two-card tab in Analyst mode — it has no point
+  const tcTab=document.querySelector('.mode-tab[data-tab="twocard"]');
+  if(tcTab){
+    tcTab.style.display=newMode==='prediction'?'none':'';
+    // If currently on two-card, switch back to live
+    if(newMode==='prediction'&&document.getElementById('panel-twocard').classList.contains('active')){
+      document.querySelectorAll('.mode-tab').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      document.querySelector('.mode-tab[data-tab="live"]').classList.add('active');
+      document.getElementById('panel-live').classList.add('active');
+    }
+  }
   if(newMode==='speed'){
     updateSpeedScoreDisplay();
     document.getElementById('speed-status').textContent='Upload or freeze a card to start!';
@@ -1412,11 +1424,6 @@ document.querySelectorAll('.mode-tab').forEach(btn=>{
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
     btn.classList.add('active');document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
     if(btn.dataset.tab==='photo'&&isRunning)document.getElementById('cam-btn').click();
-    // Two-card doesn't work with Analyst mode — switch to Classic
-    if(btn.dataset.tab==='twocard'&&gameMode==='prediction'){
-      switchGameMode('classic');
-      showToast('🎯 Switched to Classic — Analyst has no point in Two-Card mode');
-    }
     document.getElementById('prediction-panel').classList.toggle('show',gameMode==='prediction');
     document.getElementById('speed-panel').classList.toggle('show',gameMode==='speed');
   });
