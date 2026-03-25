@@ -346,6 +346,8 @@ body.dark .speed-key.hint-hl{background:rgba(245,158,11,.2)}
 /* ── TWO-CARD MODE ── */
 .twocard-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
 @media(max-width:600px){.twocard-grid{grid-template-columns:1fr}}
+#tc-img-a,#tc-img-b{width:100%;height:100%;object-fit:contain;position:relative;z-index:1;border-radius:16px;max-height:300px}
+#tc-media-a,#tc-media-b{max-height:320px;min-height:180px}
 .tc-btns{display:flex;justify-content:center;margin-bottom:10px}
 .btn-tc{background:var(--cyan);color:#fff}
 .tc-result{border-radius:18px;overflow:hidden;border:3px solid #1a1a2e;box-shadow:5px 5px 0 #1a1a2e;margin-bottom:18px;animation:bounceIn .48s cubic-bezier(.16,1,.3,1) both}
