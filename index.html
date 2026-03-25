@@ -265,7 +265,8 @@ body.dark .pred-item.pred-dup{background:rgba(14,165,233,.12)}
 /* ── SPEED PANEL ── */
 .speed-panel{display:none;margin-bottom:18px}
 .speed-panel.show{display:block;animation:bounceIn .4s cubic-bezier(.16,1,.3,1)}
-.speed-hud{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.speed-hud{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:480px){.speed-hud{grid-template-columns:repeat(2,1fr)}}
 .speed-hud-card{background:var(--card);border:3px solid #1a1a2e;border-radius:16px;padding:14px 8px 10px;text-align:center;box-shadow:4px 4px 0 #1a1a2e;transition:transform .15s}
 .speed-hud-card:hover{transform:translateY(-2px)}
 .speed-hud-val{font-family:'Fredoka One',cursive;font-size:clamp(1.5rem,5vw,2.1rem);line-height:1;color:var(--orange)}
@@ -341,6 +342,94 @@ body.dark .speed-status{border-color:rgba(255,255,255,.15);background:rgba(255,2
 body.dark .speed-key.correct{background:rgba(34,197,94,.2)}
 body.dark .speed-key.wrong{background:rgba(239,68,68,.2)}
 body.dark .speed-key.hint-hl{background:rgba(245,158,11,.2)}
+.speed-hud-val.is-accuracy{color:var(--pink)}
+/* ── TWO-CARD MODE ── */
+.twocard-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+@media(max-width:600px){.twocard-grid{grid-template-columns:1fr}}
+.tc-btns{display:flex;justify-content:center;margin-bottom:10px}
+.btn-tc{background:var(--cyan);color:#fff}
+.tc-result{border-radius:18px;overflow:hidden;border:3px solid #1a1a2e;box-shadow:5px 5px 0 #1a1a2e;margin-bottom:18px;animation:bounceIn .48s cubic-bezier(.16,1,.3,1) both}
+.tc-result.found{border-color:var(--green);box-shadow:5px 5px 0 var(--green)}
+.tc-result.none{border-color:var(--red);box-shadow:5px 5px 0 var(--red)}
+.tc-result-head{padding:16px 22px;display:flex;align-items:center;gap:12px}
+.tc-result-head.found{background:linear-gradient(135deg,#bbf7d0,#86efac)}
+.tc-result-head.none{background:linear-gradient(135deg,#fecaca,#fca5a5)}
+body.dark .tc-result-head.found{background:rgba(34,197,94,.2)}
+body.dark .tc-result-head.none{background:rgba(239,68,68,.15)}
+.tc-result-icon{font-size:36px;animation:spinOnce .55s ease-out}
+.tc-result-title{font-family:'Fredoka One',cursive;font-size:clamp(17px,5vw,21px);color:#1a1a2e}
+body.dark .tc-result-title{color:var(--text)}
+.tc-result-sub{font-size:12px;color:#374151;font-weight:700;margin-top:2px}
+body.dark .tc-result-sub{color:var(--muted)}
+.tc-result-body{background:var(--card);padding:18px 22px}
+.tc-shared-grid{display:flex;gap:10px;flex-wrap:wrap}
+.tc-shared-item{background:#f0fdf4;border:2.5px solid var(--green);border-radius:13px;padding:10px 14px;display:flex;align-items:center;gap:9px;animation:popBounce .38s cubic-bezier(.16,1,.3,1) both;box-shadow:3px 3px 0 var(--green)}
+body.dark .tc-shared-item{background:rgba(34,197,94,.08)}
+.tc-shared-emoji{font-size:26px}
+.tc-shared-name{font-size:13px;font-weight:900;color:var(--text);text-transform:capitalize}
+/* ── SUSPICIOUS ALERT ── */
+.suspicious-banner{display:none;background:rgba(251,191,36,.15);border:3px solid var(--yellow);border-radius:12px;padding:10px 16px;margin-bottom:14px;font-size:12px;font-weight:800;color:#92400e;box-shadow:3px 3px 0 var(--yellow);align-items:center;gap:8px}
+.suspicious-banner.show{display:flex}
+body.dark .suspicious-banner{color:#fbbf24}
+/* ── THEMES ── */
+body.theme-ocean{
+  --sky:#0c4a6e;--sky2:#0369a1;--sky3:#0284c7;
+  --purple:#06b6d4;--purple2:#0891b2;
+}
+body.theme-sunset{
+  --sky:#7c2d12;--sky2:#c2410c;--sky3:#ea580c;
+  --purple:#f97316;--purple2:#ea580c;
+}
+body.theme-forest{
+  --sky:#14532d;--sky2:#166534;--sky3:#15803d;
+  --purple:#16a34a;--purple2:#15803d;
+}
+body.theme-space{
+  --sky:#020617;--sky2:#0f172a;--sky3:#1e1b4b;
+  --card:#0f172aee;--text:#f8fafc;--muted:#94a3b8;
+  --border:rgba(255,255,255,0.1);
+}
+body.theme-space .stars{display:block}
+.stars{display:none;position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
+
+/* ── DIFFICULTY BADGE ── */
+.diff-badge{display:inline-flex;align-items:center;gap:8px;border-radius:50px;padding:8px 18px;font-family:'Fredoka One',cursive;font-size:15px;border:3px solid #1a1a2e;box-shadow:3px 3px 0 #1a1a2e;margin:0 auto 14px;animation:popBounce .5s cubic-bezier(.16,1,.3,1) both}
+.diff-badge.easy{background:#dcfce7;color:#166534}
+.diff-badge.chill{background:#dbeafe;color:#1e40af}
+.diff-badge.tricky{background:#fef9c3;color:#854d0e}
+.diff-badge.intense{background:#ffedd5;color:#9a3412}
+.diff-badge.chaos{background:#fce7f3;color:#9d174d}
+.diff-wrap{text-align:center;margin-bottom:4px}
+
+/* ── SPEED TOP TIMES ── */
+.speed-times-wrap{background:var(--card);border-radius:18px;padding:14px 16px;border:3px solid #1a1a2e;box-shadow:4px 4px 0 #1a1a2e;margin-bottom:14px}
+.speed-times-title{font-family:'Fredoka One',cursive;font-size:13px;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.speed-time-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:10px;margin-bottom:4px;background:rgba(0,0,0,.04);border:1.5px solid var(--border)}
+body.dark .speed-time-row{background:rgba(255,255,255,.04)}
+.speed-time-medal{font-size:16px;line-height:1;flex-shrink:0}
+.speed-time-val{font-family:'Fredoka One',cursive;font-size:17px;color:var(--purple);min-width:46px}
+.speed-time-sym{font-size:12px;font-weight:900;color:var(--muted);flex:1;text-transform:capitalize;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.speed-time-acc{font-size:11px;font-weight:900;color:var(--green);flex-shrink:0}
+
+/* ── HEATMAP MODAL ── */
+.heatmap-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:8100;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.heatmap-overlay.open{display:flex;animation:fadeIn .22s ease}
+.heatmap-modal{background:var(--card);border-radius:22px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;border:3px solid #1a1a2e;box-shadow:6px 6px 0 #1a1a2e;padding:24px 20px;animation:bounceIn .3s cubic-bezier(.16,1,.3,1)}
+.heatmap-modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.heatmap-modal-title{font-family:'Fredoka One',cursive;font-size:20px;color:var(--text)}
+.heatmap-summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.heatmap-stat{flex:1;min-width:100px;background:rgba(0,0,0,.05);border-radius:12px;padding:10px 12px;text-align:center;border:2px solid var(--border)}
+body.dark .heatmap-stat{background:rgba(255,255,255,.05)}
+.heatmap-stat-val{font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--purple)}
+.heatmap-stat-lbl{font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.heatmap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:7px}
+.hm-cell{border-radius:12px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;border:2.5px solid transparent;cursor:default;transition:transform .15s}
+.hm-cell:hover{transform:translateY(-3px)}
+.hm-cell-emoji{font-size:22px;line-height:1}
+.hm-cell-name{font-size:8px;font-weight:900;color:var(--text);text-transform:capitalize;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+.hm-cell-count{font-family:'Fredoka One',cursive;font-size:13px}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-thumb{background:rgba(0,0,0,.2);border-radius:3px}
 </style>
@@ -348,9 +437,27 @@ body.dark .speed-key.hint-hl{background:rgba(245,158,11,.2)}
 <body>
 
 <div class="sym-bg" id="sym-bg"></div>
+<div class="stars" id="stars"></div>
 <div id="confetti"></div>
 <div id="toast"></div>
 <div class="screen-flash" id="screen-flash"></div>
+
+<!-- HEATMAP MODAL -->
+<div class="heatmap-overlay" id="heatmap-overlay">
+  <div class="heatmap-modal">
+    <div class="heatmap-modal-header">
+      <div class="heatmap-modal-title">📊 Symbol Heatmap</div>
+      <button class="modal-close" id="heatmap-close" style="position:static">✕</button>
+    </div>
+    <div class="heatmap-summary">
+      <div class="heatmap-stat"><div class="heatmap-stat-val" id="hm-total">0</div><div class="heatmap-stat-lbl">Total Seen</div></div>
+      <div class="heatmap-stat"><div class="heatmap-stat-val" id="hm-unique">0</div><div class="heatmap-stat-lbl">Unique Symbols</div></div>
+      <div class="heatmap-stat"><div class="heatmap-stat-val" id="hm-never">0</div><div class="heatmap-stat-lbl">Never Seen</div></div>
+      <div class="heatmap-stat"><div class="heatmap-stat-val" id="hm-top">—</div><div class="heatmap-stat-lbl">Most Seen</div></div>
+    </div>
+    <div class="heatmap-grid" id="heatmap-grid"></div>
+  </div>
+</div>
 
 <!-- MODAL -->
 <div class="modal-overlay" id="modal-overlay">
@@ -360,31 +467,35 @@ body.dark .speed-key.hint-hl{background:rgba(245,158,11,.2)}
     <h2>✨ Features Guide</h2>
     <div class="modal-tabs">
       <button class="modal-tab active" data-mt="modes">🎮 Modes</button>
-      <button class="modal-tab" data-mt="live">📹 Live</button>
-      <button class="modal-tab" data-mt="photo">🖼️ Photo</button>
-      <button class="modal-tab" data-mt="shared">⚙️ Settings</button>
+      <button class="modal-tab" data-mt="live">📹 Input</button>
+      <button class="modal-tab" data-mt="speed">⚡ Speed</button>
+      <button class="modal-tab" data-mt="shared">⚙️ Extra</button>
     </div>
     <div class="modal-panel active" id="mt-modes">
-      <div class="feat-item"><div class="feat-icon">🔍</div><div class="feat-text"><h4>Analyst Mode</h4><p>Scans the card and lists every symbol found along with its frequency. No bounding boxes — just a clean symbol breakdown. Great for cataloging a card's contents in real time.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">🎯</div><div class="feat-text"><h4>Classic Mode</h4><p>Automatically highlights matching symbols (those appearing 2+ times) with glowing, color-coded bounding boxes. Each duplicate class gets its own distinct neon color.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">⚡</div><div class="feat-text"><h4>Speed Mode</h4><p>Race the clock! The AI finds the match silently. You tap the correct symbol on the keyboard below. A live timer tracks your reaction time. Use Hint if stuck — it reveals the answer on canvas.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">🔍</div><div class="feat-text"><h4>Analyst Mode</h4><p>Scans the card and draws a cyan bounding box on every detected symbol, plus a live frequency list below. Updates in real time while the camera is running.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">🎯</div><div class="feat-text"><h4>Classic Mode</h4><p>Only highlights duplicate symbols (those appearing 2+ times) with color-coded neon glow boxes. Each duplicate class gets its own distinct color. Best for quickly spotting the match.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">⚡</div><div class="feat-text"><h4>Speed Mode</h4><p>Race the clock! Tap every duplicate symbol on the keyboard as fast as possible. Timer runs until all duplicates are found. Tracks accuracy, streak, and logs your top 5 session times.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">🃏🃏</div><div class="feat-text"><h4>Two-Card Mode</h4><p>Upload two cards — the AI finds which symbols appear on both. Shared symbols are highlighted in matching colors on each card. This is actual Spot It! rules!</p></div></div>
     </div>
     <div class="modal-panel" id="mt-live">
-      <div class="feat-item"><div class="feat-icon">📷</div><div class="feat-text"><h4>Start / Stop Camera</h4><p>Opens your rear camera with real-time symbol detection. Detection style depends on active Game Mode.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">📸</div><div class="feat-text"><h4>Freeze &amp; Analyze</h4><p>Captures the current frame, stops camera, runs full analysis. In Speed Mode this starts the timed game round.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">⏳</div><div class="feat-text"><h4>Countdown Freeze</h4><p>Shows a 3-2-1 countdown before capturing. Gives you time to hold the card perfectly still.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">📷</div><div class="feat-text"><h4>Live Camera</h4><p>Opens your rear camera for real-time detection. Start/Stop and Freeze &amp; Analyze buttons appear. Detection style follows the active game mode.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">📸</div><div class="feat-text"><h4>Freeze &amp; Analyze</h4><p>Captures the current frame and runs full analysis. In Speed Mode, this starts the timed round. Supports optional 3-2-1 countdown first.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">🖼️</div><div class="feat-text"><h4>Photo Upload</h4><p>Upload any image from your gallery. Works in all 4 modes. History thumbnails show last 8 cards with green (match found) or red (no match) badges.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">🏷️</div><div class="feat-text"><h4>Card Difficulty Badge</h4><p>After every scan a difficulty badge appears based on duplicate symbol count: 😴 Easy (1 dup) → 🙂 Chill → 😤 Tricky → 😱 Intense → 🤯 Chaos (7+ dups).</p></div></div>
     </div>
-    <div class="modal-panel" id="mt-photo">
-      <div class="feat-item"><div class="feat-icon">🖼️</div><div class="feat-text"><h4>Upload Card</h4><p>Upload a photo from your gallery. The AI instantly detects all symbols. Results depend on active Game Mode.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">📜</div><div class="feat-text"><h4>Card History</h4><p>Thumbnails of your last 8 scanned cards. Green badge = duplicates found. Red badge = no match.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">🔄</div><div class="feat-text"><h4>Reset</h4><p>Clears the image, resets session stats, empties history.</p></div></div>
+    <div class="modal-panel" id="mt-speed">
+      <div class="feat-item"><div class="feat-icon">⏱</div><div class="feat-text"><h4>Live Timer</h4><p>Starts the moment the card is analyzed. Stops when you tap the last correct symbol. Shows elapsed time in the HUD in real time.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">🎯</div><div class="feat-text"><h4>Accuracy Tracking</h4><p>Wrong taps vs total taps shown as a percentage in the HUD. Updates live every tap.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">🔥</div><div class="feat-text"><h4>Streak Counter</h4><p>Increments when you complete a round with zero wrong taps. Resets on any wrong tap. Toast notifications fire at streak milestones.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">🏅</div><div class="feat-text"><h4>Session Top Times</h4><p>Your 5 fastest correct rounds this session, shown above the keyboard with medal icons and accuracy per entry.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">💡</div><div class="feat-text"><h4>Hint</h4><p>Reveals the current target symbol with an orange glow box on the card and highlights the correct key on the keyboard.</p></div></div>
     </div>
     <div class="modal-panel" id="mt-shared">
-      <div class="feat-item"><div class="feat-icon">🎯</div><div class="feat-text"><h4>Confidence Slider</h4><p>How certain the AI must be before drawing a box. Lower = more (noisier). Higher = fewer but more accurate. Default 30%.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">✨</div><div class="feat-text"><h4>Glow Boxes (Classic)</h4><p>Neon glow around detection boxes in Classic Mode. Each duplicate class gets its own vivid color.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">🏷️</div><div class="feat-text"><h4>Labels</h4><p>Shows symbol names on each box. Turn off to show boxes only.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">🌙</div><div class="feat-text"><h4>Dark Mode</h4><p>Switches to a dark night theme.</p></div></div>
-      <div class="feat-item"><div class="feat-icon">🔊</div><div class="feat-text"><h4>Sound</h4><p>Scan beep on detection, victory chime on match, and speed feedback sounds.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">📊</div><div class="feat-text"><h4>Symbol Heatmap</h4><p>Tap the 📊 button to open a full heatmap of all 57 symbols. Cells are colored from gray (never seen) to vivid green (seen many times). Shows total detections, unique count, never-seen count, and most-seen symbol.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">🎨</div><div class="feat-text"><h4>Themes</h4><p>Tap 🎨 to cycle through 5 themes: Default Sky → 🌊 Ocean → 🌅 Sunset → 🌲 Forest → 🌌 Space. Space theme adds 120 animated twinkling stars.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">🌙</div><div class="feat-text"><h4>Dark Mode</h4><p>Switches to a dark night theme. Works independently of the color theme.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">✨</div><div class="feat-text"><h4>Glow Boxes</h4><p>Neon glow around detection boxes. In Classic mode each duplicate class gets its own color. In Analyst mode all boxes are cyan.</p></div></div>
+      <div class="feat-item"><div class="feat-icon">🔊</div><div class="feat-text"><h4>Sound</h4><p>Scan beep, victory chime, wrong-tap buzz, and countdown ticks.</p></div></div>
     </div>
   </div>
 </div>
@@ -402,10 +513,11 @@ body.dark .speed-key.hint-hl{background:rgba(245,158,11,.2)}
     </div>
     <div class="topbar-actions">
       <button class="icon-btn" id="help-btn" title="Guide">❓</button>
+      <button class="icon-btn" id="theme-btn" title="Theme">🎨</button>
       <button class="icon-btn" id="dark-btn" title="Dark">🌙</button>
       <button class="icon-btn" id="sound-btn" title="Sound">🔊</button>
       <button class="icon-btn" id="share-btn" title="Share">📤</button>
-      <button class="icon-btn" id="stats-btn" title="Stats">📊</button>
+      <button class="icon-btn" id="stats-btn" title="Symbol Heatmap">📊</button>
     </div>
   </div>
 
@@ -414,6 +526,7 @@ body.dark .speed-key.hint-hl{background:rgba(245,158,11,.2)}
     <div class="sc"><div class="sc-val" id="sc-scans">0</div><div class="sc-lbl">🃏 Scanned</div></div>
     <div class="sc"><div class="sc-val" id="sc-matches">0</div><div class="sc-lbl">🎯 Matches</div></div>
     <div class="sc"><div class="sc-val" id="sc-symbols">0</div><div class="sc-lbl">✨ Symbols</div></div>
+    <div class="sc"><div class="sc-val" id="sc-streak" style="color:var(--orange)">0</div><div class="sc-lbl">🔥 Streak</div></div>
   </div>
 
   <!-- SESSION LEADERBOARD -->
@@ -463,6 +576,7 @@ body.dark .speed-key.hint-hl{background:rgba(245,158,11,.2)}
   <div class="mode-tabs">
     <button class="mode-tab active" data-tab="live">📹 Live Video</button>
     <button class="mode-tab" data-tab="photo">🖼️ Photo</button>
+    <button class="mode-tab" data-tab="twocard">🃏🃏 Two Cards</button>
   </div>
 
   <!-- LIVE PANEL -->
@@ -512,6 +626,7 @@ body.dark .speed-key.hint-hl{background:rgba(245,158,11,.2)}
       <div class="hist-title">📜 Frozen Frames</div>
       <div class="hist-list" id="live-hist-list"></div>
     </div>
+    <div class="diff-wrap" id="live-diff-wrap"></div>
     <div class="r-panel" id="live-results">
       <div class="r-head" id="lr-head"><div class="r-icon" id="lr-icon"></div><div><div class="r-title" id="lr-title"></div><div class="r-sub" id="lr-sub"></div></div></div>
       <div class="r-body"><div class="r-meta"><span>🎯 Symbols:</span><span class="chip chip-o" id="lr-count">0</span><span>🟢 Dups:</span><span class="chip chip-g" id="lr-dups">0</span></div><ul class="dup-grid" id="lr-grid"></ul><div class="no-dup" id="lr-nodup"></div><div class="top3-section" id="lr-top3" style="display:none"><div class="top3-title">🏆 Top 3 Most Seen Symbols</div><div class="top3-row" id="lr-top3-row"></div></div></div>
@@ -548,9 +663,54 @@ body.dark .speed-key.hint-hl{background:rgba(245,158,11,.2)}
       <div class="hist-title">📜 Recent Cards</div>
       <div class="hist-list" id="photo-hist-list"></div>
     </div>
+    <div class="diff-wrap" id="photo-diff-wrap"></div>
     <div class="r-panel" id="photo-results">
       <div class="r-head" id="pr-head"><div class="r-icon" id="pr-icon"></div><div><div class="r-title" id="pr-title"></div><div class="r-sub" id="pr-sub"></div></div></div>
       <div class="r-body"><div class="r-meta"><span>🎯 Symbols:</span><span class="chip chip-o" id="pr-count">0</span><span>🟢 Dups:</span><span class="chip chip-g" id="pr-dups">0</span></div><ul class="dup-grid" id="pr-grid"></ul><div class="no-dup" id="pr-nodup"></div><div class="top3-section" id="pr-top3" style="display:none"><div class="top3-title">🏆 Top 3 Most Seen Symbols</div><div class="top3-row" id="pr-top3-row"></div></div></div>
+    </div>
+  </div>
+
+  <!-- TWO-CARD PANEL -->
+  <div class="panel" id="panel-twocard">
+    <div class="suspicious-banner" id="tc-suspicious">⚠️ Too many symbols detected on one card — make sure cards aren't overlapping!</div>
+    <div class="twocard-grid">
+      <div class="twocard-slot">
+        <div class="tc-btns">
+          <label class="btn btn-tc">📤 Card A<input type="file" id="tc-input-a" accept="image/*"/></label>
+        </div>
+        <div class="media-card" id="tc-media-a">
+          <div class="scan-line"></div>
+          <div class="ph" id="tc-ph-a"><div class="ph-emoji">🃏</div><h3>Card A</h3><p>Upload the first card</p></div>
+          <img id="tc-img-a" alt="Card A"/>
+          <canvas id="tc-canvas-a"></canvas>
+        </div>
+      </div>
+      <div class="twocard-slot">
+        <div class="tc-btns">
+          <label class="btn btn-tc">📤 Card B<input type="file" id="tc-input-b" accept="image/*"/></label>
+        </div>
+        <div class="media-card" id="tc-media-b">
+          <div class="scan-line"></div>
+          <div class="ph" id="tc-ph-b"><div class="ph-emoji">🃏</div><h3>Card B</h3><p>Upload the second card</p></div>
+          <img id="tc-img-b" alt="Card B"/>
+          <canvas id="tc-canvas-b"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="btns">
+      <button class="btn btn-reset" id="tc-reset-btn">🔄 Reset</button>
+    </div>
+    <div class="tc-result" id="tc-result" style="display:none">
+      <div class="tc-result-head" id="tc-result-head">
+        <div class="tc-result-icon" id="tc-result-icon"></div>
+        <div>
+          <div class="tc-result-title" id="tc-result-title"></div>
+          <div class="tc-result-sub" id="tc-result-sub"></div>
+        </div>
+      </div>
+      <div class="tc-result-body">
+        <div class="tc-shared-grid" id="tc-shared-grid"></div>
+      </div>
     </div>
   </div>
 
@@ -575,6 +735,10 @@ body.dark .speed-key.hint-hl{background:rgba(245,158,11,.2)}
         <div class="speed-hud-lbl">🎯 Score</div>
       </div>
       <div class="speed-hud-card">
+        <div class="speed-hud-val is-accuracy" id="speed-acc-val">—</div>
+        <div class="speed-hud-lbl">🎯 Accuracy</div>
+      </div>
+      <div class="speed-hud-card">
         <div class="speed-hud-val is-best" id="speed-best-val">—</div>
         <div class="speed-hud-lbl">🏆 Best</div>
       </div>
@@ -582,6 +746,10 @@ body.dark .speed-key.hint-hl{background:rgba(245,158,11,.2)}
     <div class="speed-status" id="speed-status">Upload or freeze a card to start the speed game!</div>
     <div class="speed-controls">
       <button class="btn btn-hint" id="speed-hint-btn">💡 Hint</button>
+    </div>
+    <div class="speed-times-wrap" id="speed-times-wrap" style="display:none">
+      <div class="speed-times-title">🏅 Session Top Times</div>
+      <div id="speed-times-list"></div>
     </div>
     <div class="speed-keyboard-wrap">
       <div class="speed-kb-title">🎮 Tap the matching symbol below:</div>
@@ -636,7 +804,7 @@ const GM_INFO={
 const CLASSIC_PALETTE=['#f97316','#8b5cf6','#06b6d4','#ec4899','#eab308','#10b981','#3b82f6','#ef4444','#14b8a6','#a855f7','#84cc16','#f43f5e'];
 
 // ─── SPEED STATE ──────────────────────────────────────────────────────────────
-const speed={score:0,bestTime:null,timerInterval:null,timerStart:null,currentMatch:null,dupsList:[],dupsIndex:0,roundActive:false,hintShown:false,lastSel:null,lastBoxes:null,lastScores:null,lastCls:null,lastCounts:null,lastCtx:null,lastW:0,lastH:0};
+const speed={score:0,bestTime:null,timerInterval:null,timerStart:null,currentMatch:null,dupsList:[],dupsIndex:0,roundActive:false,hintShown:false,wrongTaps:0,totalTaps:0,streak:0,lastSel:null,lastBoxes:null,lastScores:null,lastCls:null,lastCounts:null,lastCtx:null,lastW:0,lastH:0};
 
 // ─── UTILITIES ────────────────────────────────────────────────────────────────
 function setStatus(m,s){document.getElementById('status-txt').textContent=m;document.getElementById('status-pill').className='status-pill'+(s?' '+s:'')}
@@ -646,6 +814,7 @@ function updateStats(){
   document.getElementById('sc-scans').textContent=stats.scans;
   document.getElementById('sc-matches').textContent=stats.matches;
   document.getElementById('sc-symbols').textContent=stats.totalSymbols;
+  document.getElementById('sc-streak').textContent=speed.streak;
   renderSessionLeaderboard();
 }
 function renderSessionLeaderboard(){
@@ -854,15 +1023,25 @@ function setupSpeedRound(counts,sel,boxes,scores,cls,ctx,W,H){
   speed.dupsIndex=0;
   speed.currentMatch=speed.dupsList[0];
   speed.roundActive=true;speed.hintShown=false;
+  speed.wrongTaps=0;speed.totalTaps=0;
+  document.getElementById('speed-acc-val').textContent='—';
   const total=speed.dupsList.length;
   statusEl.textContent=total>1?`⚡ Find all ${total} matches! (1/${total}) — tap: ${speed.currentMatch.replace(/_/g,' ')}`:`⚡ Find the match! Tap it on the keyboard!`;
   statusEl.className='speed-status active';
   startSpeedTimer();
 }
 
+function updateAccuracyDisplay(){
+  if(speed.totalTaps===0){document.getElementById('speed-acc-val').textContent='—';return}
+  const correct=speed.totalTaps-speed.wrongTaps;
+  const pct=Math.round((correct/speed.totalTaps)*100);
+  document.getElementById('speed-acc-val').textContent=pct+'%';
+}
+
 function handleSpeedKey(name){
   if(!speed.roundActive)return;
   const btn=document.querySelector(`.speed-key[data-sym="${name}"]`);
+  speed.totalTaps++;
   if(name===speed.currentMatch){
     const elapsed=((Date.now()-speed.timerStart)/1000).toFixed(1);
     if(btn){btn.classList.add('correct');setTimeout(()=>btn.classList.remove('correct'),1500)}
@@ -877,29 +1056,39 @@ function handleSpeedKey(name){
     speed.dupsIndex++;
     const total=speed.dupsList.length;
     const statusEl=document.getElementById('speed-status');
+    updateAccuracyDisplay();
     if(speed.dupsIndex<total){
-      // More dups to find — advance to next
       speed.currentMatch=speed.dupsList[speed.dupsIndex];
       speed.hintShown=false;
-      // Remove hint highlight from keyboard
       document.querySelectorAll('.speed-key').forEach(k=>k.classList.remove('hint-hl'));
       statusEl.textContent=`✅ +1! Now find: ${speed.currentMatch.replace(/_/g,' ')} (${speed.dupsIndex+1}/${total})`;
       statusEl.className='speed-status active';
-      playSound('scan');
-      flashScreen('green');
+      playSound('scan');flashScreen('green');
       showToast(`✅ Got it! ${speed.dupsIndex}/${total} — find the next!`);
     } else {
       // All dups found — round complete
       stopSpeedTimer();
       speed.score++;speed.roundActive=false;
+      // Streak: only increment if no wrong taps this round
+      if(speed.wrongTaps===0){
+        speed.streak++;
+        if(speed.streak>=3)showToast(`🔥 ${speed.streak} streak! Keep going!`,3000);
+      } else {
+        speed.streak=0;
+      }
+      updateStats();
       if(!speed.bestTime||parseFloat(elapsed)<speed.bestTime)speed.bestTime=parseFloat(elapsed);
       document.getElementById('speed-score-val').textContent=speed.score;
       document.getElementById('speed-best-val').textContent=speed.bestTime+'s';
       document.getElementById('speed-timer-val').textContent=elapsed+'s';
-      statusEl.textContent=total>1?`🏆 All ${total} found in ${elapsed}s!`:`✅ Correct! You got it in ${elapsed}s!`;
+      // Record top time
+      const finalAcc=speed.totalTaps>0?Math.round(((speed.totalTaps-speed.wrongTaps)/speed.totalTaps)*100):100;
+      const lastName=speed.dupsList[speed.dupsList.length-1];
+      addSpeedTime(elapsed,total>1?`${total} symbols`:lastName,finalAcc);
+      statusEl.textContent=total>1?`🏆 All ${total} found in ${elapsed}s!`:`✅ Correct! ${elapsed}s!`;
       statusEl.className='speed-status success';
       flashScreen('green');playSound('match');launchConfetti();
-      showToast(total>1?`🏆 All ${total} matches! ${elapsed}s`:`🎉 Correct! ${elapsed}s`);
+      if(!(speed.streak>=3))showToast(total>1?`🏆 All ${total} matches! ${elapsed}s`:`🎉 Correct! ${elapsed}s`);
       setTimeout(()=>{
         document.querySelectorAll('.speed-key').forEach(k=>k.classList.add('disabled'));
         statusEl.textContent='Upload or freeze another card to continue!';
@@ -907,7 +1096,10 @@ function handleSpeedKey(name){
       },1500);
     }
   } else {
+    speed.wrongTaps++;
+    if(speed.wrongTaps===1&&speed.streak>0){speed.streak=0;updateStats();}
     if(btn){btn.classList.add('wrong');setTimeout(()=>btn.classList.remove('wrong'),500)}
+    updateAccuracyDisplay();
     flashScreen('red');playSound('error');
   }
 }
@@ -915,6 +1107,7 @@ function handleSpeedKey(name){
 function updateSpeedScoreDisplay(){
   document.getElementById('speed-score-val').textContent=speed.score;
   document.getElementById('speed-best-val').textContent=speed.bestTime!==null?speed.bestTime+'s':'—';
+  document.getElementById('speed-acc-val').textContent='—';
 }
 
 // ─── PREDICTION MODE UI ───────────────────────────────────────────────────────
@@ -975,6 +1168,11 @@ function routeResults(finalCls,counts,imgSrc,inputMode,ctx,sel,boxes,scores,cls,
   if(dups.length>0)stats.matches++;
   dups.forEach(([name])=>{dupSymbolCardCount[name]=(dupSymbolCardCount[name]||0)+1});
   updateStats();
+  // Record for heatmap
+  recordSymbolDetections(counts);
+  // Difficulty badge — based on number of duplicate symbols
+  const diffWrap=inputMode==='live'?'live-diff-wrap':'photo-diff-wrap';
+  showDifficultyBadge(diffWrap,dups.length);
   const arr=inputMode==='live'?liveHistory:photoHistory;
   if(imgSrc){arr.unshift({src:imgSrc,count:finalCls.length,dups:dups.length});if(arr.length>8)arr.pop();renderHistory(inputMode)}
   if(gameMode==='prediction'){
@@ -1250,6 +1448,238 @@ document.getElementById('dark-btn').addEventListener('click',()=>{document.body.
 document.getElementById('sound-btn').addEventListener('click',()=>{soundOn=!soundOn;document.getElementById('sound-btn').textContent=soundOn?'🔊':'🔇';showToast(soundOn?'🔊 Sound on':'🔇 Sound off')});
 document.getElementById('share-btn').addEventListener('click',async()=>{if(navigator.share){try{await navigator.share({title:'Spot It! AI Solver',url:location.href})}catch(e){}}else navigator.clipboard.writeText(location.href).then(()=>showToast('🔗 Link copied!'))});
 document.getElementById('stats-btn').addEventListener('click',()=>showToast(`📊 ${stats.scans} scans · ${stats.matches} matches · ${stats.totalSymbols} symbols`,3500));
+
+// ─── TWO-CARD MODE ────────────────────────────────────────────────────────────
+let tcA={ready:false,sel:null,boxes:null,scores:null,cls:null,counts:{},W:0,H:0,ctx:null};
+let tcB={ready:false,sel:null,boxes:null,scores:null,cls:null,counts:{},W:0,H:0,ctx:null};
+
+function drawTwoCardHighlight(ctx,sel,boxes,cls,W,H,sharedNames,colorMap){
+  for(let i=0;i<sel.length;i++){
+    const idx=sel[i];
+    const name=classNames[cls[idx]]||'Unknown';
+    if(!sharedNames.has(name))continue;
+    const col=colorMap[name]||'#22c55e';
+    const b=boxes[idx];
+    const yn=(b[0]/640)*H,xn=(b[1]/640)*W,yx=(b[2]/640)*H,xx=(b[3]/640)*W;
+    const r=6;
+    ctx.shadowColor=col;ctx.shadowBlur=20;ctx.strokeStyle=col;ctx.lineWidth=4;
+    ctx.beginPath();ctx.moveTo(xn+r,yn);ctx.lineTo(xx-r,yn);ctx.quadraticCurveTo(xx,yn,xx,yn+r);ctx.lineTo(xx,yx-r);ctx.quadraticCurveTo(xx,yx,xx-r,yx);ctx.lineTo(xn+r,yx);ctx.quadraticCurveTo(xn,yx,xn,yx-r);ctx.lineTo(xn,yn+r);ctx.quadraticCurveTo(xn,yn,xn+r,yn);ctx.closePath();ctx.stroke();
+    ctx.shadowBlur=0;ctx.strokeStyle='#fff';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(xn+r,yn);ctx.lineTo(xx-r,yn);ctx.quadraticCurveTo(xx,yn,xx,yn+r);ctx.lineTo(xx,yx-r);ctx.quadraticCurveTo(xx,yx,xx-r,yx);ctx.lineTo(xn+r,yx);ctx.quadraticCurveTo(xn,yx,xn,yx-r);ctx.lineTo(xn,yn+r);ctx.quadraticCurveTo(xn,yn,xn+r,yn);ctx.closePath();ctx.stroke();
+    const lbl=`${emojiMap[name]||'?'} ${name.replace(/_/g,' ')}`;
+    ctx.font='bold 11px Nunito,Arial';
+    const tw=ctx.measureText(lbl).width+12,lh=19;
+    const lx=Math.max(0,Math.min(xn,W-tw)),ly=Math.max(0,yn-lh-3);
+    ctx.shadowBlur=0;ctx.fillStyle=col;
+    if(ctx.roundRect){ctx.beginPath();ctx.roundRect(lx,ly,tw,lh,5);ctx.fill();}else ctx.fillRect(lx,ly,tw,lh);
+    ctx.fillStyle='#fff';ctx.fillText(lbl,lx+6,ly+13);
+  }
+}
+
+async function analyzeTwoCardSlot(slot,imgEl,canvasEl,ctx,side){
+  const W=imgEl.clientWidth||imgEl.naturalWidth;
+  const H=imgEl.clientHeight||imgEl.naturalHeight;
+  canvasEl.width=W;canvasEl.height=H;ctx.clearRect(0,0,W,H);
+  document.getElementById(`tc-media-${side}`).classList.add('scanning');
+  playSound('scan');
+  const{boxes,scores,cls,sel}=await runInference(imgEl,photoConf);
+  document.getElementById(`tc-media-${side}`).classList.remove('scanning');
+  const counts={};
+  Array.from(sel).forEach(i=>{const n=classNames[cls[i]]||'Unknown';counts[n]=(counts[n]||0)+1});
+  // Suspicious: too many unique symbols (probably two cards in one photo)
+  const suspicious=Object.keys(counts).length>16;
+  document.getElementById('tc-suspicious').classList.toggle('show',suspicious&&(tcA.ready||tcB.ready));
+  slot.ready=true;slot.sel=sel;slot.boxes=boxes;slot.scores=scores;slot.cls=cls;slot.counts=counts;slot.W=W;slot.H=H;slot.ctx=ctx;
+  recordSymbolDetections(counts);
+  // Draw all symbols on this card in neutral style while waiting for other card
+  drawAnalystBoxes(ctx,sel,boxes,scores,cls,W,H,true,true,false);
+  if(tcA.ready&&tcB.ready)showTwoCardResult();
+}
+
+function showTwoCardResult(){
+  const sharedNames=new Set(Object.keys(tcA.counts).filter(n=>tcB.counts[n]));
+  const colorMap={};
+  [...sharedNames].forEach((n,i)=>{colorMap[n]=CLASSIC_PALETTE[i%CLASSIC_PALETTE.length]});
+  // Redraw both canvases highlighting only shared symbols
+  tcA.ctx.clearRect(0,0,tcA.W,tcA.H);tcB.ctx.clearRect(0,0,tcB.W,tcB.H);
+  drawTwoCardHighlight(tcA.ctx,tcA.sel,tcA.boxes,tcA.cls,tcA.W,tcA.H,sharedNames,colorMap);
+  drawTwoCardHighlight(tcB.ctx,tcB.sel,tcB.boxes,tcB.cls,tcB.W,tcB.H,sharedNames,colorMap);
+  const result=document.getElementById('tc-result');
+  const head=document.getElementById('tc-result-head');
+  result.style.display='block';
+  if(sharedNames.size>0){
+    result.className='tc-result found';head.className='tc-result-head found';
+    document.getElementById('tc-result-icon').textContent='🎉';
+    document.getElementById('tc-result-title').textContent=`${sharedNames.size} Shared Symbol${sharedNames.size>1?'s':''}!`;
+    document.getElementById('tc-result-sub').textContent='Highlighted on both cards above';
+    const grid=document.getElementById('tc-shared-grid');grid.innerHTML='';
+    [...sharedNames].forEach((name,i)=>{
+      const col=colorMap[name];
+      const div=document.createElement('div');div.className='tc-shared-item';
+      div.style.cssText=`border-color:${col};box-shadow:3px 3px 0 ${col};animation-delay:${i*.07}s`;
+      div.innerHTML=`<span class="tc-shared-emoji">${emojiMap[name]||'❓'}</span><span class="tc-shared-name">${name.replace(/_/g,' ')}</span>`;
+      grid.appendChild(div);
+    });
+    launchConfetti();playSound('match');showToast(`🎉 ${sharedNames.size} shared symbol${sharedNames.size>1?'s':''}!`);
+  } else {
+    result.className='tc-result none';head.className='tc-result-head none';
+    document.getElementById('tc-result-icon').textContent='🤔';
+    document.getElementById('tc-result-title').textContent='No Shared Symbols!';
+    document.getElementById('tc-result-sub').textContent='These cards have no symbols in common — check detection confidence';
+    document.getElementById('tc-shared-grid').innerHTML='<div style="font-size:13px;font-weight:800;color:var(--red)">❌ No matching symbols detected.</div>';
+    showToast('🤔 No shared symbols found!');
+  }
+}
+
+['a','b'].forEach(side=>{
+  const slot=side==='a'?tcA:tcB;
+  const input=document.getElementById(`tc-input-${side}`);
+  const img=document.getElementById(`tc-img-${side}`);
+  const canvas=document.getElementById(`tc-canvas-${side}`);
+  const ctx=canvas.getContext('2d');
+  const ph=document.getElementById(`tc-ph-${side}`);
+  input.addEventListener('change',async e=>{
+    const f=e.target.files[0];if(!f)return;
+    // Reset other card result when re-uploading
+    document.getElementById('tc-result').style.display='none';
+    const r=new FileReader();
+    r.onload=ev=>{
+      img.src=ev.target.result;img.style.display='block';ph.style.display='none';
+      img.onload=()=>analyzeTwoCardSlot(slot,img,canvas,ctx,side);
+    };
+    r.readAsDataURL(f);e.target.value='';
+  });
+});
+
+document.getElementById('tc-reset-btn').addEventListener('click',()=>{
+  ['a','b'].forEach(side=>{
+    const img=document.getElementById(`tc-img-${side}`);
+    const canvas=document.getElementById(`tc-canvas-${side}`);
+    canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+    img.style.display='none';
+    document.getElementById(`tc-ph-${side}`).style.display='flex';
+    const slot=side==='a'?tcA:tcB;
+    Object.assign(slot,{ready:false,sel:null,boxes:null,scores:null,cls:null,counts:{},W:0,H:0,ctx:null});
+  });
+  document.getElementById('tc-result').style.display='none';
+  document.getElementById('tc-suspicious').classList.remove('show');
+  showToast('🔄 Two-card reset!');
+});
+
+// ─── THEMES ──────────────────────────────────────────────────────────────────
+const THEMES=['','theme-ocean','theme-sunset','theme-forest','theme-space'];
+const THEME_LABELS=['☀️ Default','🌊 Ocean','🌅 Sunset','🌲 Forest','🌌 Space'];
+let themeIdx=0;
+
+function buildStars(){
+  const el=document.getElementById('stars');el.innerHTML='';
+  for(let i=0;i<120;i++){
+    const s=document.createElement('div');s.className='star';
+    const size=Math.random()*3+1;
+    s.style.cssText=`width:${size}px;height:${size}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-duration:${2+Math.random()*4}s;animation-delay:${Math.random()*4}s;opacity:${Math.random()*.8+.2}`;
+    el.appendChild(s);
+  }
+}
+buildStars();
+
+document.getElementById('theme-btn').addEventListener('click',()=>{
+  document.body.classList.remove(...THEMES.filter(t=>t));
+  themeIdx=(themeIdx+1)%THEMES.length;
+  if(THEMES[themeIdx])document.body.classList.add(THEMES[themeIdx]);
+  document.getElementById('theme-btn').textContent=THEME_LABELS[themeIdx].split(' ')[0];
+  showToast(`${THEME_LABELS[themeIdx]} theme`);
+});
+
+// ─── CARD DIFFICULTY BADGE ────────────────────────────────────────────────────
+function getDifficulty(dupCount){
+  if(dupCount===0)return{label:'🧩 No Match',cls:'chill'};
+  if(dupCount===1)return{label:'😴 Easy',cls:'easy'};
+  if(dupCount===2)return{label:'🙂 Chill',cls:'chill'};
+  if(dupCount<=4)return{label:'😤 Tricky',cls:'tricky'};
+  if(dupCount<=6)return{label:'😱 Intense',cls:'intense'};
+  return{label:'🤯 Chaos!',cls:'chaos'};
+}
+function showDifficultyBadge(wrapId,dupCount){
+  const wrap=document.getElementById(wrapId);if(!wrap)return;
+  const d=getDifficulty(dupCount);
+  wrap.innerHTML=`<span class="diff-badge ${d.cls}">${d.label} <span style="font-size:11px;font-weight:800;opacity:.7">${dupCount} dup${dupCount!==1?'s':''}</span></span>`;
+}
+
+// ─── SPEED TOP TIMES ─────────────────────────────────────────────────────────
+let speedTopTimes=[];
+const TIME_MEDALS=['🥇','🥈','🥉','4️⃣','5️⃣'];
+
+function addSpeedTime(elapsed,matchName,accuracy){
+  speedTopTimes.push({t:parseFloat(elapsed),name:matchName,acc:accuracy});
+  speedTopTimes.sort((a,b)=>a.t-b.t);
+  speedTopTimes=speedTopTimes.slice(0,5);
+  renderSpeedTimes();
+}
+function renderSpeedTimes(){
+  if(speedTopTimes.length===0)return;
+  const wrap=document.getElementById('speed-times-wrap');
+  const list=document.getElementById('speed-times-list');
+  wrap.style.display='block';list.innerHTML='';
+  speedTopTimes.forEach((entry,i)=>{
+    const row=document.createElement('div');row.className='speed-time-row';
+    row.innerHTML=`<span class="speed-time-medal">${TIME_MEDALS[i]}</span><span class="speed-time-val">${entry.t}s</span><span class="speed-time-sym">${entry.name.replace(/_/g,' ')}</span><span class="speed-time-acc">${entry.acc}%</span>`;
+    list.appendChild(row);
+  });
+}
+
+// ─── SYMBOL HEATMAP ───────────────────────────────────────────────────────────
+let symbolDetectionCounts={};
+
+function recordSymbolDetections(counts){
+  Object.entries(counts).forEach(([name,n])=>{
+    symbolDetectionCounts[name]=(symbolDetectionCounts[name]||0)+n;
+  });
+}
+
+function openHeatmap(){
+  const total=Object.values(symbolDetectionCounts).reduce((s,n)=>s+n,0);
+  const unique=Object.keys(symbolDetectionCounts).length;
+  const never=classNames.length-unique;
+  const topEntry=Object.entries(symbolDetectionCounts).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('hm-total').textContent=total;
+  document.getElementById('hm-unique').textContent=unique;
+  document.getElementById('hm-never').textContent=never;
+  document.getElementById('hm-top').textContent=topEntry?`${emojiMap[topEntry[0]]||'?'} ×${topEntry[1]}`:'—';
+  const maxCount=topEntry?topEntry[1]:1;
+  const grid=document.getElementById('heatmap-grid');grid.innerHTML='';
+  const heatColors=[
+    [200,200,210],  // never seen - soft gray
+    [167,243,208],  // low - light green
+    [52,211,153],   // med-low
+    [16,185,129],   // med
+    [5,150,105],    // med-high
+    [4,120,87],     // high
+  ];
+  function lerpColor(c1,c2,t){return c1.map((v,i)=>Math.round(v+(c2[i]-v)*t))}
+  function countToColor(n){
+    if(n===0)return`rgb(${heatColors[0].join(',')})`;
+    const pct=Math.min(n/maxCount,1);
+    const idx=pct*(heatColors.length-2);
+    const lo=Math.floor(idx),hi=Math.min(lo+1,heatColors.length-1);
+    const c=lerpColor(heatColors[lo+1],heatColors[hi+1],idx-lo);
+    return`rgb(${c.join(',')})`;
+  }
+  classNames.forEach(name=>{
+    const n=symbolDetectionCounts[name]||0;
+    const bg=countToColor(n);
+    const textColor=n>0?'#fff':'var(--muted)';
+    const borderColor=n>0?bg:'var(--border)';
+    const cell=document.createElement('div');cell.className='hm-cell';
+    cell.style.cssText=`background:${bg};border-color:${borderColor}`;
+    cell.innerHTML=`<span class="hm-cell-emoji">${emojiMap[name]||'❓'}</span><span class="hm-cell-name" style="color:${textColor}">${name.replace(/_/g,' ')}</span><span class="hm-cell-count" style="color:${textColor};opacity:${n>0?1:.4}">${n>0?'×'+n:'—'}</span>`;
+    grid.appendChild(cell);
+  });
+  document.getElementById('heatmap-overlay').classList.add('open');
+}
+
+document.getElementById('stats-btn').addEventListener('click',openHeatmap);
+document.getElementById('heatmap-close').addEventListener('click',()=>document.getElementById('heatmap-overlay').classList.remove('open'));
+document.getElementById('heatmap-overlay').addEventListener('click',e=>{if(e.target.id==='heatmap-overlay')document.getElementById('heatmap-overlay').classList.remove('open')});
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 updateStats();loadModel();
