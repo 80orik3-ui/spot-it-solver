@@ -681,7 +681,7 @@ body.dark .heatmap-stat{background:rgba(255,255,255,.05)}
         <div class="media-card" id="tc-media-a">
           <div class="scan-line"></div>
           <div class="ph" id="tc-ph-a"><div class="ph-emoji">🃏</div><h3>Card A</h3><p>Upload the first card</p></div>
-          <img id="tc-img-a" alt="Card A"/>
+          <img id="tc-img-a" alt="Card A" style="display:none"/>
           <canvas id="tc-canvas-a"></canvas>
         </div>
       </div>
@@ -692,7 +692,7 @@ body.dark .heatmap-stat{background:rgba(255,255,255,.05)}
         <div class="media-card" id="tc-media-b">
           <div class="scan-line"></div>
           <div class="ph" id="tc-ph-b"><div class="ph-emoji">🃏</div><h3>Card B</h3><p>Upload the second card</p></div>
-          <img id="tc-img-b" alt="Card B"/>
+          <img id="tc-img-b" alt="Card B" style="display:none"/>
           <canvas id="tc-canvas-b"></canvas>
         </div>
       </div>
@@ -1447,7 +1447,6 @@ document.querySelectorAll('.modal-tab').forEach(t=>{
 document.getElementById('dark-btn').addEventListener('click',()=>{document.body.classList.toggle('dark');document.getElementById('dark-btn').textContent=document.body.classList.contains('dark')?'☀️':'🌙';showToast(document.body.classList.contains('dark')?'🌙 Dark mode':'☀️ Light mode')});
 document.getElementById('sound-btn').addEventListener('click',()=>{soundOn=!soundOn;document.getElementById('sound-btn').textContent=soundOn?'🔊':'🔇';showToast(soundOn?'🔊 Sound on':'🔇 Sound off')});
 document.getElementById('share-btn').addEventListener('click',async()=>{if(navigator.share){try{await navigator.share({title:'Spot It! AI Solver',url:location.href})}catch(e){}}else navigator.clipboard.writeText(location.href).then(()=>showToast('🔗 Link copied!'))});
-document.getElementById('stats-btn').addEventListener('click',()=>showToast(`📊 ${stats.scans} scans · ${stats.matches} matches · ${stats.totalSymbols} symbols`,3500));
 
 // ─── TWO-CARD MODE ────────────────────────────────────────────────────────────
 let tcA={ready:false,sel:null,boxes:null,scores:null,cls:null,counts:{},W:0,H:0,ctx:null};
@@ -1540,12 +1539,12 @@ function showTwoCardResult(){
   const ph=document.getElementById(`tc-ph-${side}`);
   input.addEventListener('change',async e=>{
     const f=e.target.files[0];if(!f)return;
-    // Reset other card result when re-uploading
     document.getElementById('tc-result').style.display='none';
     const r=new FileReader();
     r.onload=ev=>{
-      img.src=ev.target.result;img.style.display='block';ph.style.display='none';
-      img.onload=()=>analyzeTwoCardSlot(slot,img,canvas,ctx,side);
+      ph.style.display='none';
+      img.onload=()=>{img.style.display='block';analyzeTwoCardSlot(slot,img,canvas,ctx,side)};
+      img.src=ev.target.result;
     };
     r.readAsDataURL(f);e.target.value='';
   });
