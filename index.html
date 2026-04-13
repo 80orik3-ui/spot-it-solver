@@ -7,14 +7,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <title>Spot It! AI Solver</title>
 <script>
-// Unregister any stale service workers that could block page/model loading
+// Only unregister broken service workers (don't clear cache - breaks mobile)
 if('serviceWorker' in navigator){
   navigator.serviceWorker.getRegistrations().then(regs=>{
-    regs.forEach(r=>{r.unregister();console.log('Unregistered SW:',r.scope)});
+    regs.forEach(r=>r.unregister());
   });
-}
-if('caches' in window){
-  caches.keys().then(keys=>keys.forEach(k=>caches.delete(k)));
 }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>
@@ -869,23 +866,17 @@ function launchConfetti(){
 // ─── MODEL LOADING ────────────────────────────────────────────────────────────
 async function loadModel(){
   try{
-    for(const backend of ['webgl','wasm','cpu']){
-      try{await tf.setBackend(backend);await tf.ready();break}catch(e){continue}
-    }
+    await tf.ready();
     setStatus('Loading model… ⏳');
     const fullPath=new URL(MODEL_PATH,location.href).href;
     console.log('Loading model from:',fullPath);
     model=await tf.loadGraphModel(fullPath);
-    const dummy=tf.zeros([1,640,640,3]);
-    await model.executeAsync(dummy);
-    dummy.dispose();
     setStatus('Ready to play! 🎉','ready');
-    showToast('🤖 Model loaded ('+tf.getBackend().toUpperCase()+')!');
+    showToast('🤖 AI Model loaded!');
   }catch(e){
     console.error('Model load error:',e);
-    const is404=e.message&&(e.message.includes('404')||e.message.includes('not found')||e.message.includes('Failed to fetch'));
-    setStatus(is404?'Model not found 😢':'Model error 😢','error');
-    showToast(is404?'❌ model.json not found — check yolov8_tfjs/ folder on GitHub':'❌ '+e.message,7000);
+    setStatus('Model not found 😢','error');
+    showToast('❌ '+e.message,6000);
   }
 }
 
