@@ -6,15 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <title>Spot It! AI Solver</title>
-<script>
-// Only unregister broken service workers (don't clear cache - breaks mobile)
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.getRegistrations().then(regs=>{
-    regs.forEach(r=>r.unregister());
-  });
-}
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -865,19 +857,8 @@ function launchConfetti(){
 
 // ─── MODEL LOADING ────────────────────────────────────────────────────────────
 async function loadModel(){
-  try{
-    await tf.ready();
-    setStatus('Loading model… ⏳');
-    const fullPath=new URL(MODEL_PATH,location.href).href;
-    console.log('Loading model from:',fullPath);
-    model=await tf.loadGraphModel(fullPath);
-    setStatus('Ready to play! 🎉','ready');
-    showToast('🤖 AI Model loaded!');
-  }catch(e){
-    console.error('Model load error:',e);
-    setStatus('Model not found 😢','error');
-    showToast('❌ '+e.message,6000);
-  }
+  try{model=await tf.loadGraphModel(MODEL_PATH);setStatus('Ready to play! 🎉','ready');showToast('🤖 AI Model loaded!')}
+  catch(e){setStatus('Model not found 😢','error');showToast('❌ Error loading model.',4000);console.error(e)}
 }
 
 // ─── INFERENCE ────────────────────────────────────────────────────────────────
