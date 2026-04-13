@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>"/>
 <title>Spot It! AI Solver</title>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet"/>
@@ -858,22 +860,30 @@ function launchConfetti(){
 // ─── MODEL LOADING ────────────────────────────────────────────────────────────
 async function loadModel(){
   try{
-    await tf.ready();
-    model=await tf.loadGraphModel(MODEL_PATH);
-    // Warmup pass so first inference isn't slow
+    // Try WebGL first, fall back to WASM then CPU
+    for(const backend of ['webgl','wasm','cpu']){
+      try{ await tf.setBackend(backend); await tf.ready(); break; }catch(e){ continue; }
+    }
+    setStatus('Loading model… ⏳');
+    // Show the exact URL being fetched to help debug
+    const fullPath=new URL(MODEL_PATH,location.href).href;
+    console.log('Loading model from:',fullPath);
+    model=await tf.loadGraphModel(fullPath);
+    // Warmup pass
     const dummy=tf.zeros([1,640,640,3]);
     await model.executeAsync(dummy);
     dummy.dispose();
-    setStatus('Ready to play! 🎉','ready');showToast('🤖 AI Model loaded!')
+    setStatus('Ready to play! 🎉','ready');
+    showToast('🤖 Model loaded ('+tf.getBackend().toUpperCase()+')!');
   }catch(e){
     console.error('Model load error:',e);
-    if(e.message&&e.message.includes('fetch')){
-      setStatus('Model not found 😢 — check yolov8_tfjs/ folder','error');
-      showToast('❌ Cannot find model.json — is the yolov8_tfjs folder next to this file?',6000);
-    } else {
-      setStatus('Model error 😢','error');
-      showToast('❌ Error loading model: '+e.message,5000);
-    }
+    const is404=e.message&&(e.message.includes('404')||e.message.includes('not found')||e.message.includes('Failed to fetch'));
+    setStatus(is404?'Model not found 😢':'Model error 😢','error');
+    const msg=is404
+      ? '❌ model.json not found — check the yolov8_tfjs/ folder is pushed to GitHub'
+      : '❌ '+e.message;
+    showToast(msg,7000);
+    console.warn('Tried path:',new URL(MODEL_PATH,location.href).href);
   }
 }
 
