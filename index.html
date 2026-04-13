@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <title>Spot It! AI Solver</title>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -857,8 +857,24 @@ function launchConfetti(){
 
 // ─── MODEL LOADING ────────────────────────────────────────────────────────────
 async function loadModel(){
-  try{model=await tf.loadGraphModel(MODEL_PATH);setStatus('Ready to play! 🎉','ready');showToast('🤖 AI Model loaded!')}
-  catch(e){setStatus('Model not found 😢','error');showToast('❌ Error loading model.',4000);console.error(e)}
+  try{
+    await tf.ready();
+    model=await tf.loadGraphModel(MODEL_PATH);
+    // Warmup pass so first inference isn't slow
+    const dummy=tf.zeros([1,640,640,3]);
+    await model.executeAsync(dummy);
+    dummy.dispose();
+    setStatus('Ready to play! 🎉','ready');showToast('🤖 AI Model loaded!')
+  }catch(e){
+    console.error('Model load error:',e);
+    if(e.message&&e.message.includes('fetch')){
+      setStatus('Model not found 😢 — check yolov8_tfjs/ folder','error');
+      showToast('❌ Cannot find model.json — is the yolov8_tfjs folder next to this file?',6000);
+    } else {
+      setStatus('Model error 😢','error');
+      showToast('❌ Error loading model: '+e.message,5000);
+    }
+  }
 }
 
 // ─── INFERENCE ────────────────────────────────────────────────────────────────
