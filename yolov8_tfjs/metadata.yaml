@@ -1,7 +1,7 @@
-description: Ultralytics best model trained on /content/spot-it--19/data.yaml
+description: Ultralytics best model trained on /content/spot-it--35/data.yaml
 author: Ultralytics
-date: '2026-03-15T21:20:18.299429'
-version: 8.4.22
+date: '2026-04-21T13:20:24.498055'
+version: 8.4.40
 license: AGPL-3.0 License (https://ultralytics.com/license)
 docs: https://docs.ultralytics.com
 stride: 32
