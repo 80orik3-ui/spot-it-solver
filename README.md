@@ -4,6 +4,7 @@ A web-based tool that uses a custom YOLOv8 model converted to TensorFlow.js to a
 
 Everything runs completely client-side in the browser—no external servers or backend required.
 
+![image](https://github.com/user-attachments/assets/xxxx-xxxx-xxxx)
 ## Features
 
 * **Real-time webcam detection:** Hold two cards up to your camera to instantly see the matching symbol highlighted.
