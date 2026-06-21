@@ -4,6 +4,8 @@ A web-based tool that uses a custom YOLOv8 model converted to TensorFlow.js to a
 
 Everything runs completely client-side in the browser—no external servers or backend required.
 
+an example for a predicition on a picture:
+
 <img width="320" height="320" alt="spotIt3" src="https://github.com/user-attachments/assets/26d3f8ce-f700-46cd-98d8-643ce960c567" />
 
 ## Features
