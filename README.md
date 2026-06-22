@@ -19,7 +19,8 @@ an example for a predicition on a picture:
 
 * **Frontend:** HTML, CSS, JavaScript / TypeScript
 * **ML Framework:** TensorFlow.js
-* **Model:** YOLOv8s (exported to TF.js Graph Model format)
+* **Model:** YOLOv8s (exported to TF.js Graph Model format), was trained in **spot_it-code.ipynb**
+  
 
 ## Getting Started
 
