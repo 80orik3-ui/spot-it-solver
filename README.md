@@ -25,6 +25,7 @@ an example for a predicition on a picture:
 ## Getting Started
 
 Because the app loads local model files (`model.json` and shards) via TensorFlow.js, you need to run it through a local server to avoid CORS browser restrictions.
+**notice to put your roboflow api key if your run the notebook**
 
 ### Running Locally
 
